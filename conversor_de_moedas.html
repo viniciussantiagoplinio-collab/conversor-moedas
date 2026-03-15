@@ -1,0 +1,209 @@
+
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font-sans); }
+  .converter { max-width: 480px; margin: 1.5rem auto; padding: 0 1rem; }
+  .header { text-align: center; margin-bottom: 1.5rem; }
+  .header h1 { font-size: 18px; font-weight: 500; color: var(--color-text-primary); }
+  .header p { font-size: 13px; color: var(--color-text-secondary); margin-top: 4px; }
+  .card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1.25rem; margin-bottom: 12px; }
+  .field-label { font-size: 12px; color: var(--color-text-secondary); margin-bottom: 6px; letter-spacing: 0.03em; }
+  .field-row { display: flex; gap: 8px; align-items: stretch; }
+  .amount-input { flex: 1; font-size: 22px; font-weight: 500; color: var(--color-text-primary); background: transparent; border: none; outline: none; padding: 0; min-width: 0; }
+  .amount-input::placeholder { color: var(--color-text-tertiary); }
+  .currency-select { font-size: 14px; font-weight: 500; color: var(--color-text-primary); background: var(--color-background-secondary); border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); padding: 6px 10px; cursor: pointer; outline: none; min-width: 90px; }
+  .swap-btn { display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 50%; background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); cursor: pointer; margin: 0 auto 12px; transition: background 0.15s; }
+  .swap-btn:hover { background: var(--color-background-tertiary); }
+  .swap-icon { width: 16px; height: 16px; color: var(--color-text-secondary); }
+  .result-amount { font-size: 28px; font-weight: 500; color: var(--color-text-primary); }
+  .result-currency { font-size: 14px; color: var(--color-text-secondary); margin-top: 2px; }
+  .rate-info { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 10px 14px; font-size: 12px; color: var(--color-text-secondary); display: flex; justify-content: space-between; align-items: center; margin-top: 12px; }
+  .rate-badge { font-size: 11px; background: var(--color-background-success); color: var(--color-text-success); padding: 2px 8px; border-radius: 20px; }
+  .popular-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 1rem; }
+  .popular-card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 10px 12px; cursor: pointer; transition: border-color 0.15s; }
+  .popular-card:hover { border-color: var(--color-border-primary); }
+  .popular-card .pair { font-size: 11px; color: var(--color-text-secondary); margin-bottom: 2px; }
+  .popular-card .rate { font-size: 13px; font-weight: 500; color: var(--color-text-primary); }
+  .error { font-size: 13px; color: var(--color-text-danger); text-align: center; padding: 8px; }
+  .loading { font-size: 13px; color: var(--color-text-secondary); text-align: center; padding: 8px; }
+  .updated { font-size: 11px; color: var(--color-text-tertiary); text-align: center; margin-top: 8px; }
+</style>
+
+<div class="converter">
+  <div class="header">
+    <h1>Conversor de moedas</h1>
+    <p id="status" class="loading">Buscando cotações...</p>
+  </div>
+
+  <div class="card">
+    <div class="field-label">Valor</div>
+    <div class="field-row">
+      <input class="amount-input" type="number" id="amount" value="1" placeholder="0" />
+      <select class="currency-select" id="from-currency"></select>
+    </div>
+  </div>
+
+  <button class="swap-btn" id="swap-btn" title="Inverter">
+    <svg class="swap-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+      <path d="M3 5h10M10 2l3 3-3 3M13 11H3M6 8l-3 3 3 3" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </button>
+
+  <div class="card">
+    <div class="field-label">Resultado</div>
+    <div class="field-row">
+      <div style="flex:1; min-width:0;">
+        <div class="result-amount" id="result">—</div>
+        <div class="result-currency" id="result-label"></div>
+      </div>
+      <select class="currency-select" id="to-currency"></select>
+    </div>
+    <div class="rate-info" id="rate-info" style="display:none;">
+      <span id="rate-text"></span>
+      <span class="rate-badge" id="rate-badge">ao vivo</span>
+    </div>
+  </div>
+
+  <div class="popular-grid" id="popular-grid"></div>
+  <div class="updated" id="updated-at"></div>
+</div>
+
+<script>
+const CURRENCIES = [
+  {code:'BRL',name:'Real brasileiro',flag:'🇧🇷'},
+  {code:'USD',name:'Dólar americano',flag:'🇺🇸'},
+  {code:'EUR',name:'Euro',flag:'🇪🇺'},
+  {code:'GBP',name:'Libra esterlina',flag:'🇬🇧'},
+  {code:'ARS',name:'Peso argentino',flag:'🇦🇷'},
+  {code:'JPY',name:'Iene japonês',flag:'🇯🇵'},
+  {code:'CAD',name:'Dólar canadense',flag:'🇨🇦'},
+  {code:'CHF',name:'Franco suíço',flag:'🇨🇭'},
+  {code:'CNY',name:'Yuan chinês',flag:'🇨🇳'},
+  {code:'MXN',name:'Peso mexicano',flag:'🇲🇽'},
+  {code:'AUD',name:'Dólar australiano',flag:'🇦🇺'},
+  {code:'CLP',name:'Peso chileno',flag:'🇨🇱'},
+  {code:'COP',name:'Peso colombiano',flag:'🇨🇴'},
+  {code:'PEN',name:'Sol peruano',flag:'🇵🇪'},
+  {code:'UYU',name:'Peso uruguaio',flag:'🇺🇾'},
+  {code:'BTC',name:'Bitcoin',flag:'₿'},
+  {code:'ETH',name:'Ethereum',flag:'⟠'},
+];
+
+const POPULAR_PAIRS = [
+  {from:'USD',to:'BRL'},
+  {from:'EUR',to:'BRL'},
+  {from:'GBP',to:'BRL'},
+  {from:'ARS',to:'BRL'},
+  {from:'BTC',to:'USD'},
+  {from:'EUR',to:'USD'},
+];
+
+let rates = {};
+let lastUpdated = null;
+
+const fromSel = document.getElementById('from-currency');
+const toSel = document.getElementById('to-currency');
+const amountInput = document.getElementById('amount');
+const resultEl = document.getElementById('result');
+const resultLabel = document.getElementById('result-label');
+const rateInfo = document.getElementById('rate-info');
+const rateText = document.getElementById('rate-text');
+const statusEl = document.getElementById('status');
+const popularGrid = document.getElementById('popular-grid');
+const updatedAt = document.getElementById('updated-at');
+
+function populateSelects(selectedFrom = 'USD', selectedTo = 'BRL') {
+  [fromSel, toSel].forEach((sel, idx) => {
+    sel.innerHTML = '';
+    CURRENCIES.forEach(c => {
+      const opt = document.createElement('option');
+      opt.value = c.code;
+      opt.textContent = c.code;
+      if ((idx === 0 && c.code === selectedFrom) || (idx === 1 && c.code === selectedTo)) opt.selected = true;
+      sel.appendChild(opt);
+    });
+  });
+}
+
+function convert() {
+  const amount = parseFloat(amountInput.value) || 0;
+  const from = fromSel.value;
+  const to = toSel.value;
+  if (!rates[from] || !rates[to]) return;
+
+  const amountInUSD = amount / rates[from];
+  const converted = amountInUSD * rates[to];
+  const rate = rates[to] / rates[from];
+
+  resultEl.textContent = converted.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: to === 'JPY' || to === 'CLP' ? 0 : 2});
+  const currency = CURRENCIES.find(c => c.code === to);
+  resultLabel.textContent = currency ? currency.name : to;
+
+  rateText.textContent = `1 ${from} = ${rate.toLocaleString('pt-BR', {minimumFractionDigits: 4, maximumFractionDigits: 4})} ${to}`;
+  rateInfo.style.display = 'flex';
+
+  updatePopular();
+}
+
+function updatePopular() {
+  popularGrid.innerHTML = '';
+  POPULAR_PAIRS.forEach(pair => {
+    if (!rates[pair.from] || !rates[pair.to]) return;
+    const rate = rates[pair.to] / rates[pair.from];
+    const card = document.createElement('div');
+    card.className = 'popular-card';
+    card.innerHTML = `<div class="pair">${pair.from} → ${pair.to}</div><div class="rate">${rate.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: pair.to === 'JPY' ? 0 : 2})}</div>`;
+    card.addEventListener('click', () => {
+      fromSel.value = pair.from;
+      toSel.value = pair.to;
+      convert();
+    });
+    popularGrid.appendChild(card);
+  });
+}
+
+async function fetchRates() {
+  try {
+    const res = await fetch('https://open.er-api.com/v6/latest/USD');
+    const data = await res.json();
+    if (data.result !== 'success') throw new Error();
+    rates = data.rates;
+    rates['USD'] = 1;
+
+    const btcRes = await fetch('https://api.coindesk.com/v1/bpi/currentprice/USD.json');
+    const btcData = await btcRes.json();
+    rates['BTC'] = 1 / btcData.bpi.USD.rate_float;
+    rates['ETH'] = rates['BTC'] * 0.05;
+  } catch(e) {
+    try {
+      const res2 = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
+      const d2 = await res2.json();
+      rates = d2.rates;
+    } catch(e2) {
+      statusEl.textContent = 'Erro ao carregar cotações';
+      statusEl.style.color = 'var(--color-text-danger)';
+      return;
+    }
+  }
+
+  const now = new Date();
+  lastUpdated = now;
+  statusEl.textContent = 'Cotações em tempo real';
+  statusEl.style.color = 'var(--color-text-success)';
+  updatedAt.textContent = `Atualizado em ${now.toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'})}`;
+  convert();
+}
+
+populateSelects();
+fromSel.addEventListener('change', convert);
+toSel.addEventListener('change', convert);
+amountInput.addEventListener('input', convert);
+document.getElementById('swap-btn').addEventListener('click', () => {
+  const tmp = fromSel.value;
+  fromSel.value = toSel.value;
+  toSel.value = tmp;
+  convert();
+});
+
+fetchRates();
+</script>
