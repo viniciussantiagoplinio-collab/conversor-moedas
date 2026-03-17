@@ -250,9 +250,9 @@
     <label>Modelo</label>
     <select id="model-setup">
       <option value="gemini-3.1-flash-lite" selected>Gemini 3.1 Flash Lite — rápido e gratuito ⭐</option>
-      <option value="gemini-3.1-flash">Gemini 3.1 Flash — equilibrado e gratuito</option>
-      <option value="gemini-3.1-pro-preview">Gemini 3.1 Pro — mais inteligente</option>
     </select>
+    <div class="model-desc" id="models-status" style="font-size:11px;color:var(--text3);margin-top:3px;">Cole sua chave e clique em "Buscar modelos" para ver os disponíveis.</div>
+    <button type="button" onclick="fetchModels()" style="margin-top:6px;padding:6px 12px;border:1px solid var(--border);border-radius:7px;background:var(--bg3);color:var(--text2);font-size:12px;cursor:pointer;font-family:inherit;">Buscar modelos disponíveis</button>
   </div>
 
   <button id="start-btn" onclick="startApp()">Começar</button>
@@ -283,8 +283,6 @@
     <label>Modelo:</label>
     <select id="model-chat" onchange="saveModel()">
       <option value="gemini-3.1-flash-lite" selected>Gemini 3.1 Flash Lite</option>
-      <option value="gemini-3.1-flash">Gemini 3.1 Flash</option>
-      <option value="gemini-3.1-pro-preview">Gemini 3.1 Pro</option>
     </select>
     <span class="mbadge" id="mbadge">gratuito</span>
     <label style="display:flex;align-items:center;gap:5px;margin-left:auto;cursor:pointer;white-space:nowrap;"><input type="checkbox" id="search-toggle" onchange="saveSearch()" style="width:13px;height:13px;accent-color:var(--accent);cursor:pointer;"/><span style="font-size:11px;color:var(--text3);">Busca web</span></label>
@@ -371,8 +369,43 @@
     document.getElementById('model-setup').value = model;
     document.getElementById('search-toggle').checked = localStorage.getItem('ia_search') === 'true';
     updateMemCount();
-    if (apiKey) showApp();
+    if (apiKey) { showApp(); setTimeout(autoFetchModels, 100); }
   };
+
+  async function fetchModels() {
+    const key = document.getElementById('api-key-input').value.trim();
+    if (!key.startsWith('AIza')) { alert('Cole sua API Key primeiro.'); return; }
+    const statusEl = document.getElementById('models-status');
+    statusEl.textContent = 'Buscando modelos...';
+    try {
+      const res  = await fetch('https://generativelanguage.googleapis.com/v1beta/models?key=' + key);
+      const data = await res.json();
+      if (data.error) { statusEl.textContent = 'Erro: ' + data.error.message; return; }
+      const models = (data.models || [])
+        .filter(m => m.supportedGenerationMethods?.includes('generateContent'))
+        .filter(m => m.name.includes('gemini'))
+        .sort((a,b) => b.name.localeCompare(a.name));
+      if (!models.length) { statusEl.textContent = 'Nenhum modelo encontrado.'; return; }
+      const setupSel = document.getElementById('model-setup');
+      const chatSel  = document.getElementById('model-chat');
+      const saved    = localStorage.getItem('ia_model');
+      [setupSel, chatSel].forEach(sel => {
+        sel.innerHTML = '';
+        models.forEach(m => {
+          const id  = m.name.replace('models/', '');
+          const opt = document.createElement('option');
+          opt.value = id;
+          opt.textContent = id + (m.description ? ' — ' + m.description.split('.')[0] : '');
+          if (id === saved || (!saved && id.includes('flash-lite'))) opt.selected = true;
+          sel.appendChild(opt);
+        });
+      });
+      statusEl.textContent = models.length + ' modelos encontrados.';
+      statusEl.style.color = 'var(--green)';
+    } catch(e) {
+      statusEl.textContent = 'Erro ao buscar modelos.';
+    }
+  }
 
   function startApp() {
     const key  = document.getElementById('api-key-input').value.trim();
@@ -385,6 +418,34 @@
     localStorage.setItem('ia_model', model);
     document.getElementById('model-chat').value = model;
     showApp();
+  }
+
+  async function autoFetchModels() {
+    if (!apiKey) return;
+    try {
+      const res  = await fetch('https://generativelanguage.googleapis.com/v1beta/models?key=' + apiKey);
+      const data = await res.json();
+      if (data.error) return;
+      const models = (data.models || [])
+        .filter(m => Array.isArray(m.supportedGenerationMethods) && m.supportedGenerationMethods.includes('generateContent'))
+        .filter(m => m.name && m.name.toLowerCase().includes('gemini'))
+        .sort((a,b) => b.name.localeCompare(a.name));
+      if (!models.length) return;
+      const saved = localStorage.getItem('ia_model');
+      ['model-setup','model-chat'].forEach(id => {
+        const sel = document.getElementById(id);
+        if (!sel) return;
+        sel.innerHTML = '';
+        models.forEach(m => {
+          const modelId = m.name.replace('models/', '');
+          const opt = document.createElement('option');
+          opt.value = modelId;
+          opt.textContent = modelId;
+          if (modelId === saved || (!saved && modelId.includes('flash-lite'))) opt.selected = true;
+          sel.appendChild(opt);
+        });
+      });
+    } catch(e) { console.log('fetch models error:', e); }
   }
 
   function showApp() {
