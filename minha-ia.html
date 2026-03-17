@@ -249,9 +249,9 @@
   <div class="sf">
     <label>Modelo</label>
     <select id="model-setup">
-      <option value="gemini-2.5-flash-lite" selected>Gemini 2.5 Flash Lite — mais rápido e gratuito ⭐</option>
-      <option value="gemini-2.5-flash">Gemini 2.5 Flash — equilibrado e gratuito</option>
-      <option value="gemini-2.5-pro">Gemini 2.5 Pro — mais inteligente (100 req/dia grátis)</option>
+      <option value="gemini-3.1-flash-lite" selected>Gemini 3.1 Flash Lite — rápido e gratuito ⭐</option>
+      <option value="gemini-3.1-flash">Gemini 3.1 Flash — equilibrado e gratuito</option>
+      <option value="gemini-3.1-pro-preview">Gemini 3.1 Pro — mais inteligente</option>
     </select>
   </div>
 
@@ -282,9 +282,9 @@
   <div class="modelbar">
     <label>Modelo:</label>
     <select id="model-chat" onchange="saveModel()">
-      <option value="gemini-2.5-flash-lite" selected>Gemini 2.5 Flash Lite</option>
-      <option value="gemini-2.5-flash">Gemini 2.5 Flash</option>
-      <option value="gemini-2.5-pro">Gemini 2.5 Pro</option>
+      <option value="gemini-3.1-flash-lite" selected>Gemini 3.1 Flash Lite</option>
+      <option value="gemini-3.1-flash">Gemini 3.1 Flash</option>
+      <option value="gemini-3.1-pro-preview">Gemini 3.1 Pro</option>
     </select>
     <span class="mbadge" id="mbadge">gratuito</span>
     <label style="display:flex;align-items:center;gap:5px;margin-left:auto;cursor:pointer;white-space:nowrap;"><input type="checkbox" id="search-toggle" onchange="saveSearch()" style="width:13px;height:13px;accent-color:var(--accent);cursor:pointer;"/><span style="font-size:11px;color:var(--text3);">Busca web</span></label>
@@ -366,7 +366,7 @@
     apiKey   = localStorage.getItem('ia_gemini_key') || '';
     userName = localStorage.getItem('ia_user_name')  || '';
     memories = JSON.parse(localStorage.getItem('ia_memories') || '[]');
-    const model = localStorage.getItem('ia_model') || 'gemini-2.5-flash-lite';
+    const model = localStorage.getItem('ia_model') || 'gemini-3.1-flash-lite';
     document.getElementById('model-chat').value  = model;
     document.getElementById('model-setup').value = model;
     document.getElementById('search-toggle').checked = localStorage.getItem('ia_search') === 'true';
