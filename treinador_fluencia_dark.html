@@ -1,0 +1,153 @@
+
+<h2 class="sr-only">Treinador de fluência — Plano de Gestão Arquitetônico de Vinicius Ribeiro</h2>
+<style>
+*{box-sizing:border-box}
+.tp{padding:1rem 0;font-family:var(--font-sans);background:#0f0f0f;color:#e8e8e8;border-radius:var(--border-radius-lg);padding:1.25rem}
+.hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem}
+.snum{font-size:12px;color:#666;letter-spacing:.05em}
+.timers{display:flex;gap:20px}
+.tit{text-align:right}
+.tlabel{font-size:11px;color:#555;display:block}
+.tval{font-size:14px;font-weight:500;color:#ccc;font-family:var(--font-mono)}
+.pbar{height:2px;background:#222;border-radius:99px;margin-bottom:1rem}
+.pfill{height:100%;background:#e8e8e8;border-radius:99px;transition:width .3s}
+.scard{background:#1a1a1a;border:0.5px solid #2a2a2a;border-radius:var(--border-radius-lg);padding:1.25rem 1.25rem 1rem;margin-bottom:.75rem}
+.stitle{font-size:17px;font-weight:500;color:#f0f0f0;margin:0 0 .25rem}
+.ssub{font-size:13px;color:#888;margin:0 0 .75rem}
+.blist{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:5px}
+.blist li{font-size:13px;color:#bbb;padding-left:.875rem;position:relative;line-height:1.5}
+.blist li::before{content:'·';position:absolute;left:0;color:#555}
+.ctrl{display:flex;align-items:center;gap:7px;margin-bottom:.75rem;flex-wrap:wrap}
+.btn{padding:6px 13px;border:0.5px solid #333;border-radius:var(--border-radius-md);background:transparent;color:#ccc;cursor:pointer;font-size:13px;line-height:1.4;transition:background .12s}
+.btn:hover:not(:disabled){background:#1f1f1f}
+.btn:disabled{opacity:.3;cursor:not-allowed}
+.dbadge{font-size:11px;padding:3px 9px;border-radius:var(--border-radius-md);background:#1a2e1a;color:#5a9e5a}
+.sprow{display:flex;align-items:center;gap:7px;font-size:12px;color:#666}
+.sprow input[type=range]{accent-color:#e8e8e8}
+.sarea{border:0.5px solid #222;border-radius:var(--border-radius-lg);padding:1.25rem;margin-bottom:.75rem;font-family:var(--font-serif);font-size:15px;color:#d4d4d4;line-height:1.9;white-space:pre-wrap;background:#141414}
+.nav{display:flex;align-items:center;justify-content:space-between}
+.prog-done{font-size:12px;color:#555}
+</style>
+
+<div class="tp">
+  <div class="hdr">
+    <div>
+      <div class="snum" id="snum"></div>
+      <div class="prog-done" id="prog-done"></div>
+    </div>
+    <div class="timers">
+      <div class="tit"><span class="tlabel">este slide</span><span class="tval" id="slide-t">0:00</span></div>
+      <div class="tit"><span class="tlabel">total</span><span class="tval" id="total-t">0:00</span></div>
+    </div>
+  </div>
+
+  <div class="pbar"><div class="pfill" id="pf"></div></div>
+
+  <div class="scard">
+    <h3 class="stitle" id="stitle"></h3>
+    <p class="ssub" id="ssub"></p>
+    <ul class="blist" id="sbullets"></ul>
+  </div>
+
+  <div class="ctrl">
+    <button class="btn" id="sc-btn" onclick="toggleScroll()">Teleprompter</button>
+    <div class="sprow">vel. <input type="range" min="1" max="6" value="3" step="1" id="spd" style="width:72px"> <span id="spd-out">3</span></div>
+    <button class="btn" id="done-btn" onclick="markDone()">Praticado</button>
+    <span class="dbadge" id="dbadge" style="display:none">Praticado</span>
+  </div>
+
+  <div class="sarea" id="sarea"></div>
+
+  <div class="nav">
+    <button class="btn" id="pb" onclick="nav(-1)">← Anterior</button>
+    <span style="font-size:13px;color:#555" id="nc"></span>
+    <button class="btn" id="nb" onclick="nav(1)">Próximo →</button>
+  </div>
+</div>
+
+<script>
+const SL=[
+  {t:"Abertura",s:"Plano de Gestão — Vinicius Ribeiro Santiago da Silva",p:["Documento completo de gestão de projetos arquitetônicos","Abrange pré-serviço, execução e pós-execução","Garante qualidade e satisfação do cliente em cada fase"],r:`Olá, meu nome é Vinicius Ribeiro Santiago da Silva, arquiteto e urbanista. É um prazer apresentar a vocês o meu Plano de Gestão de Projetos, um documento que desenvolvi para garantir clareza, organização e excelência em cada etapa do nosso trabalho conjunto.\n\nEste material estrutura todo o ciclo do projeto — do primeiro contato até a entrega final — assegurando que você, como cliente, tenha total transparência sobre o processo. Vamos começar entendendo como esse documento está organizado.`},
+  {t:"Estrutura do documento",s:"Três partes essenciais",p:["Parte 1: Plano de Gestão de Projeto","Parte 2: Propostas Técnicas Autônomas","Parte 3: Modelos de Contrato para Colaboradores"],r:`O documento está dividido em três partes complementares. A primeira trata do Plano de Gestão propriamente dito, detalhando como conduzimos cada fase do projeto, desde o pré-serviço até o pós-execução.\n\nA segunda parte reúne as Propostas Técnicas Autônomas — documentos independentes para cada serviço contratado. Já a terceira apresenta os modelos de contrato que utilizamos com nossos colaboradores, garantindo relações profissionais bem definidas. Com essa estrutura, cada aspecto da nossa parceria fica documentado e acessível. Vamos agora ao detalhe da proposta inicial.`},
+  {t:"Proposta de Pré-Serviço — escopo",s:"Reforma residencial · Aracaju, SE",p:["250 m² de área reformada","Do Estudo Preliminar até o Projeto Legal protocolado","100% de planejamento como fundamento do serviço"],r:`O projeto em questão consiste na reforma residencial de uma área de 250 metros quadrados, aqui em Aracaju. Nosso trabalho nessa etapa vai do Estudo Preliminar — onde captamos a sua visão e as necessidades do espaço — até o Projeto Legal devidamente protocolado na prefeitura.\n\nAcreditamos que 100% do planejamento precisa estar sólido antes de qualquer execução. É essa base bem construída que evita surpresas no canteiro e garante um resultado que realmente atende às suas expectativas. A seguir, vemos como esse serviço é remunerado.`},
+  {t:"Honorários de Pré-Serviço",s:"R$15.000 em 5 parcelas",p:["1ª — R$1.500 na assinatura do contrato","2ª — R$2.000 com EP aprovado","3ª — R$4.500 com AP aprovado","4ª — R$5.000 no protocolo do Projeto Legal","5ª — R$2.000 na entrega final"],r:`Os honorários do Pré-Serviço totalizam R$ 15.000, distribuídos em cinco parcelas vinculadas a entregas concretas. Esse modelo é pensado para que o pagamento sempre acompanhe o avanço real do projeto.\n\nA primeira parcela de R$ 1.500 é na assinatura; a segunda, de R$ 2.000, no Estudo Preliminar aprovado; a terceira, de R$ 4.500, no Anteprojeto aprovado; a quarta, de R$ 5.000, no protocolo do Projeto Legal; e a quinta, de R$ 2.000, na entrega final do dossiê. Transparência total a cada etapa. Veja agora o cronograma que sustenta essas entregas.`},
+  {t:"Cronograma de Pré-Serviço",s:"75 dias · 3 marcos de entrega",p:["Dia 20 — Estudo Preliminar aprovado","Dia 40 — Anteprojeto aprovado","Dia 75 — Projeto Legal protocolado e dossiê entregue"],r:`O Pré-Serviço tem prazo total de 75 dias, com três marcos bem definidos. No dia 20, entregamos o Estudo Preliminar para sua aprovação — é o momento de validar o partido arquitetônico e os conceitos principais.\n\nNo dia 40, o Anteprojeto estará concluído, detalhando as soluções de planta e volumetria. E no dia 75, o Projeto Legal estará protocolado na SMDU e o dossiê completo entregue a você. Esse ritmo garante que nenhuma etapa seja apressada. Agora vamos falar sobre o contrato que formaliza tudo isso.`},
+  {t:"Contrato 001/2026",s:"Cláusulas e evento de assinatura",p:["Documentos, prazos e pagamentos como pilares do contrato","Assinatura como marco formal que inicia a parceria","Obrigações do contratante: informações e prazos"],r:`O Contrato 001/2026 é o instrumento que formaliza nossa parceria. Ele é estruturado em torno de três pilares: documentos, prazos e pagamentos — os elementos que, quando bem definidos, eliminam ambiguidades e protegem ambas as partes.\n\nO evento de assinatura marca o início oficial do projeto. Do seu lado, as principais obrigações são fornecer as informações necessárias dentro dos prazos acordados, garantindo que o trabalho flua sem interrupções. A transparência do contrato é o que permite uma relação profissional saudável. Veja a seguir quem compõe nossa equipe técnica.`},
+  {t:"Equipe técnica e parceiros",s:"Liderança e mecanismos de contratação",p:["RT Vinicius: controle de qualidade e satisfação do cliente","Parceiros formalizados por instrumentos contratuais adequados","Diversas modalidades de parceria disponíveis"],r:`Sou o Responsável Técnico por todo o projeto, o que significa que cada entrega passa pelo meu controle de qualidade antes de chegar até você. Não terceirizo essa responsabilidade.\n\nQuando parceiros especializados são necessários — como engenheiros estruturais ou projetistas de instalações — eles são formalizados com instrumentos contratuais específicos, garantindo comprometimento e clareza de escopo. Temos diferentes modalidades de parceria disponíveis, sempre escolhendo a que melhor se aplica a cada colaboração. Isso reflete nosso cuidado com a gestão do projeto como um todo. Vamos ver como o projeto é elaborado e comunicado.`},
+  {t:"Elaboração e comunicação",s:"Quatro níveis e canais diversificados",p:["Elaboração do projeto em 4 níveis progressivos","Canais: e-mail, WhatsApp, reuniões presenciais","Cada canal garante retorno oportuno ao cliente"],r:`O projeto é desenvolvido em quatro níveis progressivos de detalhamento — do conceitual ao executivo — garantindo que cada fase seja consolidada antes de avançar. Isso evita retrabalho e mantém o projeto sempre alinhado com suas expectativas.\n\nPara a comunicação, utilizamos canais diversificados: e-mail para registros formais, WhatsApp para agilidade no dia a dia e reuniões presenciais para as decisões mais estratégicas. Cada canal tem seu papel, e nos comprometemos com retornos ágeis em todos eles. A seguir, vemos como monitoramos o andamento do projeto.`},
+  {t:"Controle, monitoramento e conflitos",s:"Gestão proativa do projeto",p:["Indicadores-chave monitorados por etapa","Gestão de conflitos via encontros documentados","Estratégias proativas para riscos e eventualidades"],r:`Monitoramos indicadores-chave em cada etapa do projeto — prazos, qualidade das entregas e alinhamento com o programa acordado. Esse acompanhamento sistemático nos permite identificar desvios antes que se tornem problemas.\n\nEm caso de conflitos ou divergências, adotamos encontros documentados como primeira medida: conversa direta, registrada e focada em soluções rápidas. Também mantemos estratégias proativas para riscos previsíveis, como atrasos de aprovação ou mudanças de programa. Gestão eficiente é antecipar, não apenas reagir. Vamos falar agora sobre aprovação e legalização.`},
+  {t:"Aprovação tácita e protocolo na SMDU",s:"Revisão e legalização",p:["Silêncio após o prazo de revisão = aprovação tácita","Checklist completo para protocolo na SMDU","Conformidade garantida dentro do cronograma"],r:`Para que o projeto avance com fluidez, adotamos o princípio da aprovação tácita: se não houver manifestação sua dentro do prazo de revisão estabelecido, consideramos a entrega aprovada. Isso protege o cronograma e garante que o projeto não fique paralisado por indefinição.\n\nNo processo de legalização, utilizamos um checklist completo para o protocolo na SMDU, assegurando que toda a documentação esteja correta desde o início. Conformidade não é detalhe — é parte central do nosso escopo. A seguir, vemos o encerramento do projeto e as estratégias de divulgação.`},
+  {t:"Encerramento e marketing",s:"TERS, evento final e publicidade",p:["TERS: entrega de todos os produtos e regularização financeira","Evento de encerramento marca a conclusão da parceria","Engajamento por redes sociais e canais direcionados"],r:`O encerramento do projeto é formalizado pelo TERS — Termo de Encerramento e Regularização dos Serviços — que confirma a entrega de todos os produtos e a regularização financeira. É o ponto final oficial da nossa parceria neste projeto.\n\nRealizamos também um evento de encerramento, que celebra o trabalho concluído e fortalece o relacionamento profissional. Por fim, o projeto pode ser divulgado nas nossas redes sociais e canais de comunicação, projetando o trabalho realizado e valorizando o imóvel reformado. Agora vamos às propostas técnicas autônomas.`},
+  {t:"Propostas Técnicas Autônomas",s:"Três propostas independentes",p:["Proposta 1: Projeto Executivo","Proposta 2: Projeto de Ambientação","Proposta 3: Acompanhamento de Obra"],r:`A segunda parte do documento reúne três propostas técnicas autônomas — cada uma contratável de forma independente, de acordo com a sua necessidade.\n\nA Proposta 1 trata do Projeto Executivo, com todos os detalhamentos necessários para a execução. A Proposta 2 é o Projeto de Ambientação, voltado ao design de interiores e especificação dos acabamentos. A Proposta 3 contempla o Acompanhamento de Obra, garantindo que a execução siga fielmente o projeto. Vamos detalhar cada uma, começando pelo Projeto Executivo.`},
+  {t:"Projeto Executivo — honorários",s:"R$13.000 em 4 parcelas",p:["1ª — R$1.950 na assinatura","2ª — R$4.420 com plantas aprovadas","3ª — R$3.510 com cortes e detalhes","4ª — R$3.120 com memorial e compatibilização"],r:`O Projeto Executivo totaliza R$ 13.000, divididos em quatro parcelas vinculadas às entregas. Na assinatura, R$ 1.950; com as plantas aprovadas, R$ 4.420; com cortes e detalhes entregues, R$ 3.510; e na finalização com memorial descritivo e compatibilização, R$ 3.120.\n\nEsse modelo reforça nossa filosofia: você paga pelo que recebe, à medida que recebe. Cada parcela representa um avanço real e verificável no projeto. Veja agora o cronograma que estrutura essas entregas.`},
+  {t:"Cronograma do Projeto Executivo",s:"50 dias · 3 marcos",p:["Dia 17 — Plantas e layout concluídos","Dia 47 — Cortes e detalhes entregues","Dia 50 — Memorial descritivo e compatibilização"],r:`O Projeto Executivo é desenvolvido em 50 dias, com três marcos de entrega. No dia 17, plantas e layout concluídos — a base espacial do projeto estará definida. No dia 47, entregamos cortes, elevações e todos os detalhes construtivos.\n\nNo dia 50, finalizamos com o memorial descritivo e a compatibilização entre as disciplinas, garantindo que estrutura, hidráulica e elétrica estejam integradas. Em menos de dois meses, você terá um conjunto técnico completo para levar ao canteiro. A seguir, o Projeto de Ambientação.`},
+  {t:"Projeto de Ambientação — honorários",s:"R$13.500 em 5 parcelas",p:["1ª — R$2.025 na assinatura","2ª — R$1.485 com moodboard aprovado","3ª — R$4.050 com layout e iluminação","4ª — R$3.510 com elevações e renders","5ª — R$2.430 com caderno final"],r:`O Projeto de Ambientação tem valor total de R$ 13.500, em cinco parcelas que acompanham a evolução criativa do projeto. Começamos com R$ 2.025 na assinatura; depois R$ 1.485 com o moodboard e conceito aprovados.\n\nCom o layout e o projeto de iluminação entregues, R$ 4.050; com elevações e renders, R$ 3.510; e na entrega do caderno de especificações final, R$ 2.430. O pagamento em cinco etapas reflete a riqueza e o detalhamento deste serviço. Veja o cronograma na próxima tela.`},
+  {t:"Cronograma do Projeto de Ambientação",s:"65 dias · 3 marcos",p:["Dia 14 — Moodboard e conceito aprovados","Dia 53 — Plantas e elevações entregues","Dia 65 — Caderno de especificações final"],r:`O Projeto de Ambientação tem duração de 65 dias, com três marcos principais. No dia 14, apresentamos o moodboard e o conceito de design — é o momento de alinhar referências visuais, paleta de materiais e a identidade do espaço.\n\nNo dia 53, plantas de layout, projeto de iluminação, elevações e renders 3D estarão completos, permitindo visualizar o resultado antes mesmo da obra começar. E no dia 65, o caderno de especificações final é entregue, contendo tudo que o executor precisará para materializar o projeto com fidelidade. Passamos agora para o Acompanhamento de Obra.`},
+  {t:"Acompanhamento de Obra",s:"Proposta 3 — modalidades",p:["Assessoria técnica durante a execução da reforma","Visitas periódicas ao canteiro de obras","Verificação de conformidade com o projeto executivo"],r:`O Acompanhamento de Obra garante que tudo que foi projetado seja executado corretamente. Atuamos como assessoria técnica durante toda a reforma, sendo o elo entre o projeto e o canteiro.\n\nAs visitas periódicas permitem identificar desvios antes que se tornem erros custosos — verificando materiais, técnicas construtivas e conformidade com o projeto executivo. Para você, isso significa tranquilidade: saber que um profissional qualificado está acompanhando cada etapa da obra. Agora vamos à parte de contratos para colaboradores.`},
+  {t:"Modelos de Contrato — visão geral",s:"Cinco modelos para colaboradores",p:["Modelo A — Contrato de Sociedade","Modelo B — Estágio Supervisionado","Modelo C — Terceirizado (sem vínculo empregatício)","Modelo D — Colaborador Autônomo","Modelo E — Trabalho CLT (vínculo formal)"],r:`A terceira parte do documento apresenta cinco modelos de contrato para diferentes perfis de colaboradores. Cada modelo é adequado a uma forma específica de parceria profissional.\n\nO Modelo A trata de sociedade entre profissionais; o B, de estágio supervisionado; o C, de terceirização sem vínculo empregatício; o D, de colaboração autônoma recorrente; e o E, do contrato CLT com vínculo formal. Ter esses instrumentos bem definidos é fundamental para uma gestão de equipe ética e juridicamente segura. Vamos detalhar o Modelo E, o mais completo deles.`},
+  {t:"Modelo E — Contrato CLT",s:"Vínculo empregatício formal em detalhe",p:["44 horas semanais · 13º salário · Férias + 1/3","FGTS 8% · INSS patronal 20% + Sistema S + RAT","Aviso prévio proporcional (até 90 dias)","Modalidades: demissão, justa causa, acordo CLT"],r:`O Modelo E estabelece vínculo empregatício formal com todos os direitos previstos na CLT. A jornada é de 44 horas semanais, com direito a 13º salário, férias acrescidas de um terço, FGTS de 8% e INSS patronal de 20%, além do Sistema S e do RAT.\n\nO aviso prévio é proporcional ao tempo de serviço, podendo chegar a 90 dias. O contrato prevê todas as modalidades de rescisão: demissão sem justa causa, pedido de demissão, justa causa, rescisão indireta e acordo conforme o art. 484-A da CLT. É o modelo mais robusto, indicado para colaborações permanentes e estratégicas. Chegamos à nossa última seção.`},
+  {t:"Encerramento e contato",s:"Obrigado pela atenção",p:["Site profissional de Vinicius Ribeiro","E-mail e WhatsApp profissional","Parceria sólida e projetos bem executados"],r:`Chegamos ao final desta apresentação. Espero ter transmitido com clareza como trabalho e o cuidado que coloco em cada projeto — da concepção ao acompanhamento da obra.\n\nEstou à disposição para esclarecer qualquer dúvida, aprofundar algum ponto ou dar início à nossa parceria. Você pode me contatar pelo site, pelo e-mail ou diretamente pelo WhatsApp. Agradeço imensamente pela sua atenção e interesse. Será um prazer construir algo especial com você.`}
+];
+
+const done=new Array(SL.length).fill(false);
+let cur=0,sT=0,tT=0,sInt,tInt,scInt,isScrolling=false;
+const fmt=s=>Math.floor(s/60)+':'+(s%60<10?'0':'')+s%60;
+
+function startTimers(){
+  clearInterval(sInt);sT=0;
+  document.getElementById('slide-t').textContent='0:00';
+  sInt=setInterval(()=>{sT++;document.getElementById('slide-t').textContent=fmt(sT)},1000);
+  if(!tInt)tInt=setInterval(()=>{tT++;document.getElementById('total-t').textContent=fmt(tT)},1000);
+}
+
+function render(){
+  const s=SL[cur];
+  document.getElementById('snum').textContent='Seção '+(cur+1)+' de '+SL.length;
+  const nd=done.filter(Boolean).length;
+  document.getElementById('prog-done').textContent=nd>0?nd+' de '+SL.length+' praticadas':'';
+  document.getElementById('pf').style.width=((cur+1)/SL.length*100)+'%';
+  document.getElementById('stitle').textContent=s.t;
+  document.getElementById('ssub').textContent=s.s;
+  const ul=document.getElementById('sbullets');ul.innerHTML='';
+  s.p.forEach(p=>{const li=document.createElement('li');li.textContent=p;ul.appendChild(li)});
+  document.getElementById('pb').disabled=cur===0;
+  document.getElementById('nb').disabled=cur===SL.length-1;
+  document.getElementById('nc').textContent=(cur+1)+' / '+SL.length;
+  document.getElementById('done-btn').style.display=done[cur]?'none':'inline-block';
+  document.getElementById('dbadge').style.display=done[cur]?'inline-block':'none';
+  document.getElementById('sarea').textContent=s.r;
+  document.getElementById('sarea').scrollTop=0;
+  document.getElementById('sarea').style.overflow='';
+  document.getElementById('sarea').style.maxHeight='';
+  document.getElementById('sc-btn').textContent='Teleprompter';
+  isScrolling=false;clearInterval(scInt);
+  startTimers();
+}
+
+function nav(d){cur=Math.max(0,Math.min(SL.length-1,cur+d));render()}
+function markDone(){done[cur]=true;render()}
+
+function toggleScroll(){
+  isScrolling=!isScrolling;
+  const a=document.getElementById('sarea'),b=document.getElementById('sc-btn');
+  if(isScrolling){
+    b.textContent='Parar';
+    a.style.overflow='hidden';a.style.maxHeight='200px';a.scrollTop=0;
+    clearInterval(scInt);
+    scInt=setInterval(()=>{
+      a.scrollTop+=parseInt(document.getElementById('spd').value);
+      if(a.scrollTop>=a.scrollHeight-a.clientHeight-4){
+        isScrolling=false;clearInterval(scInt);
+        b.textContent='Teleprompter';
+        a.style.overflow='';a.style.maxHeight='';
+      }
+    },60);
+  } else {
+    clearInterval(scInt);b.textContent='Teleprompter';
+    a.style.overflow='';a.style.maxHeight='';
+  }
+}
+
+document.getElementById('spd').addEventListener('input',e=>document.getElementById('spd-out').textContent=e.target.value);
+render();
+</script>
