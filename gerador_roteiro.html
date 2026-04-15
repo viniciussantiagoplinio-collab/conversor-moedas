@@ -8,99 +8,101 @@
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
   --bg:#0a0a0a;--bg2:#111;--bg3:#161616;--bg4:#1a1a1a;
-  --border:#252525;--border2:#2e2e2e;--border3:#333;
+  --border:#252525;--border2:#2e2e2e;--border3:#383838;
   --text:#e8e8e8;--text2:#aaa;--text3:#666;--text4:#444;
   --green:#4a9e6a;--green-bg:#0e1e14;
-  --red:#c0453a;--amber:#c08a3a;--blue:#5a8fd4;
+  --red:#c0453a;--blue:#5a8fd4;
 }
 body{background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,sans-serif;height:100vh;overflow:hidden}
-.app{display:grid;grid-template-columns:320px 1fr;height:100vh;overflow:hidden}
-@media(max-width:700px){.app{grid-template-columns:1fr;height:auto;overflow:auto}}
+.app{display:grid;grid-template-columns:300px 1fr;height:100vh;overflow:hidden}
 
 /* ── SIDEBAR ── */
 .sidebar{background:var(--bg2);border-right:0.5px solid var(--border);display:flex;flex-direction:column;height:100vh;overflow:hidden}
-.sidebar-header{padding:1rem;border-bottom:0.5px solid var(--border);flex-shrink:0}
-.sidebar-header h1{font-size:14px;font-weight:500;color:var(--text)}
-.sidebar-header p{font-size:11px;color:var(--text3);margin-top:2px}
 
-.api-section{padding:.75rem 1rem;border-bottom:0.5px solid var(--border);flex-shrink:0}
-.slabel{font-size:11px;color:var(--text4);margin-bottom:6px;display:flex;align-items:center;justify-content:space-between;letter-spacing:.04em}
-.api-link{font-size:11px;color:var(--blue);text-decoration:none}
-.api-link:hover{text-decoration:underline}
-.api-saved{font-size:10px;color:var(--green)}
+.sb-top{padding:.875rem 1rem;border-bottom:0.5px solid var(--border);flex-shrink:0}
+.sb-top h1{font-size:14px;font-weight:500;color:var(--text);margin-bottom:.5rem}
+.sb-actions{display:flex;gap:5px}
+.sa-btn{flex:1;padding:6px 0;border:0.5px solid var(--border2);border-radius:7px;background:transparent;color:var(--text2);font-size:12px;cursor:pointer;transition:all .12s;text-align:center}
+.sa-btn:hover{background:var(--bg3);color:var(--text)}
+.sa-btn.hi{border-color:var(--border3);color:var(--text)}
+
+/* collapsible API */
+.api-toggle-row{padding:.6rem 1rem;border-bottom:0.5px solid var(--border);display:flex;align-items:center;justify-content:space-between;cursor:pointer;flex-shrink:0;user-select:none}
+.api-toggle-row span{font-size:11px;color:var(--text4);letter-spacing:.04em}
+.api-toggle-row .arr{font-size:10px;color:var(--text4);transition:transform .2s}
+.api-toggle-row .arr.open{transform:rotate(180deg)}
+.api-body{border-bottom:0.5px solid var(--border);padding:.75rem 1rem;flex-shrink:0;display:none}
+.api-body.open{display:block}
 .api-row{display:flex;gap:5px;margin-bottom:5px}
 .api-inp{flex:1;background:var(--bg3);border:0.5px solid var(--border2);border-radius:7px;padding:6px 9px;color:var(--text);font-size:12px;font-family:monospace;outline:none}
 .api-inp:focus{border-color:var(--text4)}
-.ib{background:var(--bg3);border:0.5px solid var(--border2);border-radius:7px;color:var(--text3);cursor:pointer;padding:0 9px;font-size:12px;transition:background .12s}
+.ib{background:var(--bg3);border:0.5px solid var(--border2);border-radius:7px;color:var(--text3);cursor:pointer;padding:0 9px;font-size:12px;flex-shrink:0}
 .ib:hover{background:var(--bg4)}
 .api-hint{font-size:11px;color:var(--text4);line-height:1.5}
+.api-link{color:var(--blue);text-decoration:none}
+.api-link:hover{text-decoration:underline}
+.api-saved{font-size:10px;color:var(--green);margin-left:4px}
 
-.saves-section{padding:.75rem 1rem;border-bottom:0.5px solid var(--border);flex-shrink:0}
-.saves-row{display:flex;gap:5px}
-.saves-inp{flex:1;background:var(--bg3);border:0.5px solid var(--border2);border-radius:7px;padding:6px 9px;color:var(--text);font-size:12px;outline:none}
-.saves-inp:focus{border-color:var(--text4)}
-.saves-select{flex:1;background:var(--bg3);border:0.5px solid var(--border2);border-radius:7px;padding:6px 9px;color:var(--text2);font-size:12px;outline:none;cursor:pointer}
-.saves-select option{background:var(--bg3)}
+/* save/load */
+.save-section{padding:.75rem 1rem;border-bottom:0.5px solid var(--border);flex-shrink:0}
+.slabel{font-size:11px;color:var(--text4);margin-bottom:6px;letter-spacing:.04em}
+.save-row{display:flex;gap:5px;margin-bottom:5px}
+.si{flex:1;background:var(--bg3);border:0.5px solid var(--border2);border-radius:7px;padding:6px 9px;color:var(--text);font-size:12px;outline:none}
+.si:focus{border-color:var(--text4)}
+.si::placeholder{color:var(--text4)}
+select.si{color:var(--text2);cursor:pointer}
+select.si option{background:var(--bg3)}
 
+/* import */
 .import-section{padding:.75rem 1rem;border-bottom:0.5px solid var(--border);flex-shrink:0}
-.itabs{display:flex;gap:4px;margin-bottom:7px}
-.itab{flex:1;padding:5px 0;border:0.5px solid var(--border2);border-radius:6px;background:transparent;color:var(--text3);font-size:11px;cursor:pointer;text-align:center;transition:all .12s}
-.itab.active{background:var(--bg3);color:var(--text2);border-color:#444}
-.ibody{display:none}.ibody.active{display:block}
-.iinp{width:100%;background:var(--bg3);border:0.5px solid var(--border2);border-radius:7px;padding:6px 9px;color:var(--text);font-size:12px;outline:none;margin-bottom:5px}
-.iinp:focus{border-color:var(--text4)}
-.itarea{resize:vertical;min-height:80px;line-height:1.5;font-size:12px;font-family:inherit}
-.iinp::placeholder,.itarea::placeholder{color:var(--text4)}
-.ibtn{width:100%;padding:6px;background:transparent;border:0.5px solid var(--border2);border-radius:7px;color:var(--text2);font-size:12px;cursor:pointer;transition:all .12s;text-align:center}
-.ibtn:hover:not(:disabled){background:var(--bg3);color:var(--text)}
-.ibtn:disabled{opacity:.4;cursor:not-allowed}
-.drop-zone{border:0.5px dashed var(--border2);border-radius:7px;padding:1rem;text-align:center;color:var(--text4);font-size:12px;cursor:pointer;transition:all .12s;margin-bottom:5px}
+.drop-zone{border:0.5px dashed var(--border2);border-radius:7px;padding:1rem;text-align:center;color:var(--text4);font-size:12px;cursor:pointer;transition:all .12s;margin-bottom:5px;line-height:1.5}
 .drop-zone:hover,.drop-zone.drag{border-color:#555;color:var(--text3);background:var(--bg3)}
 .drop-zone input{display:none}
+.ibtn{width:100%;padding:6px;background:transparent;border:0.5px solid var(--border2);border-radius:7px;color:var(--text2);font-size:12px;cursor:pointer;transition:all .12s}
+.ibtn:hover:not(:disabled){background:var(--bg3);color:var(--text)}
+.ibtn:disabled{opacity:.4;cursor:not-allowed}
 .istatus{font-size:11px;color:var(--text3);margin-top:4px;min-height:14px;line-height:1.4}
 .istatus.ok{color:var(--green)}.istatus.err{color:var(--red)}
 
-.slides-header{padding:.6rem 1rem .4rem;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
-.slides-header span{font-size:11px;color:var(--text3)}
+/* slides list */
+.slides-hdr{padding:.6rem 1rem .4rem;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.slides-hdr span{font-size:11px;color:var(--text3)}
 .add-btn{background:transparent;border:0.5px solid var(--border2);border-radius:6px;color:var(--text2);font-size:11px;padding:3px 9px;cursor:pointer}
 .add-btn:hover{background:var(--bg3)}
-
 .slides-list{flex:1;overflow-y:auto;padding:.4rem;min-height:0}
-.slides-list::-webkit-scrollbar{width:4px}
-.slides-list::-webkit-scrollbar-track{background:transparent}
+.slides-list::-webkit-scrollbar{width:3px}
 .slides-list::-webkit-scrollbar-thumb{background:var(--border2);border-radius:99px}
 
-.slide-item{background:var(--bg3);border:0.5px solid var(--border);border-radius:9px;padding:.75rem;margin-bottom:.4rem;cursor:pointer;transition:border-color .12s}
-.slide-item:hover{border-color:var(--border2)}
-.slide-item.active{border-color:#555}
-.si-top{display:flex;align-items:flex-start;justify-content:space-between;gap:7px}
+.si-item{background:var(--bg3);border:0.5px solid var(--border);border-radius:8px;padding:.65rem .75rem;margin-bottom:.35rem;cursor:pointer;transition:border-color .12s}
+.si-item:hover{border-color:var(--border2)}
+.si-item.active{border-color:#555}
+.si-top{display:flex;align-items:flex-start;justify-content:space-between;gap:6px}
 .si-num{font-size:10px;color:var(--text4);flex-shrink:0;margin-top:1px}
-.si-title{font-size:12px;color:var(--text);font-weight:500;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.si-del{background:none;border:none;color:var(--text4);cursor:pointer;font-size:15px;padding:0;flex-shrink:0;line-height:1}
+.si-ttl{font-size:12px;color:var(--text);font-weight:500;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.si-del{background:none;border:none;color:var(--text4);cursor:pointer;font-size:14px;padding:0;line-height:1}
 .si-del:hover{color:var(--red)}
-.si-status{font-size:10px;color:var(--text4);margin-top:3px}
-.si-status.done{color:var(--green)}.si-status.ready{color:var(--text3)}
+.si-st{font-size:10px;color:var(--text4);margin-top:2px}
+.si-st.done{color:var(--green)}.si-st.ready{color:var(--text3)}
 
 /* ── MAIN ── */
 .main{display:flex;flex-direction:column;height:100vh;overflow:hidden}
 .pbar{height:2px;background:var(--border);flex-shrink:0}
 .pfill{height:100%;background:var(--text3);transition:width .3s}
 
-.toolbar{padding:.75rem 1.25rem;border-bottom:0.5px solid var(--border);display:flex;align-items:center;gap:7px;flex-wrap:wrap;flex-shrink:0}
-.tbar-title{font-size:13px;color:var(--text2);flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.btn{padding:5px 13px;border:0.5px solid var(--border2);border-radius:7px;background:transparent;color:var(--text2);font-size:12px;cursor:pointer;transition:all .12s;white-space:nowrap}
+.toolbar{padding:.7rem 1.25rem;border-bottom:0.5px solid var(--border);display:flex;align-items:center;gap:6px;flex-wrap:wrap;flex-shrink:0}
+.tbar-title{font-size:12px;color:var(--text2);flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.btn{padding:5px 12px;border:0.5px solid var(--border2);border-radius:7px;background:transparent;color:var(--text2);font-size:12px;cursor:pointer;transition:all .12s;white-space:nowrap}
 .btn:hover:not(:disabled){background:var(--bg3);color:var(--text)}
 .btn:disabled{opacity:.3;cursor:not-allowed}
 .btn.hi{border-color:var(--border3);color:var(--text)}
-.done-badge{font-size:10px;padding:3px 9px;border-radius:6px;background:var(--green-bg);color:var(--green);display:none}
-.timers{display:flex;gap:12px;margin-left:auto}
+.done-badge{font-size:10px;padding:2px 8px;border-radius:5px;background:var(--green-bg);color:var(--green);display:none}
+.timers{display:flex;gap:12px}
 .tim{text-align:right}
-.tim-label{font-size:10px;color:var(--text4);display:block}
+.tim-lbl{font-size:10px;color:var(--text4);display:block}
 .tim-val{font-size:12px;font-weight:500;color:var(--text2);font-family:monospace}
 
 .main-body{flex:1;overflow-y:auto;padding:1.25rem;min-height:0}
-.main-body::-webkit-scrollbar{width:4px}
-.main-body::-webkit-scrollbar-track{background:transparent}
+.main-body::-webkit-scrollbar{width:3px}
 .main-body::-webkit-scrollbar-thumb{background:var(--border2);border-radius:99px}
 
 .empty{text-align:center;padding:4rem 2rem;color:var(--text3)}
@@ -109,52 +111,71 @@ body{background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,
 
 .editor{display:none;flex-direction:column;gap:.875rem}
 .editor.visible{display:flex}
-.fl{font-size:11px;color:var(--text3);margin-bottom:5px;display:block;letter-spacing:.04em}
-.fi{width:100%;background:var(--bg3);border:0.5px solid var(--border);border-radius:7px;padding:9px 11px;color:var(--text);font-size:13px;outline:none;transition:border-color .12s;font-family:inherit}
-.fi:focus{border-color:#555}
-.fta{resize:vertical;min-height:80px;line-height:1.6;font-size:12px}
 
-/* nav buttons */
-.slide-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:.875rem}
-.nav-btn{padding:6px 16px;border:0.5px solid var(--border2);border-radius:7px;background:transparent;color:var(--text2);font-size:13px;cursor:pointer;transition:all .12s}
+.slide-nav{display:flex;align-items:center;justify-content:space-between}
+.nav-btn{padding:5px 14px;border:0.5px solid var(--border2);border-radius:7px;background:transparent;color:var(--text2);font-size:12px;cursor:pointer;transition:all .12s}
 .nav-btn:hover:not(:disabled){background:var(--bg3);color:var(--text)}
 .nav-btn:disabled{opacity:.25;cursor:not-allowed}
 .nav-pos{font-size:12px;color:var(--text4)}
 
+.fl{font-size:11px;color:var(--text3);margin-bottom:5px;display:block;letter-spacing:.04em}
+.fi{width:100%;background:var(--bg3);border:0.5px solid var(--border);border-radius:7px;padding:8px 11px;color:var(--text);font-size:13px;outline:none;transition:border-color .12s;font-family:inherit}
+.fi:focus{border-color:#555}
+.fi::placeholder{color:var(--text4)}
+.fta{resize:vertical;min-height:80px;line-height:1.6;font-size:12px}
+
 /* roteiro */
 .rbox{background:var(--bg2);border:0.5px solid var(--border);border-radius:9px;overflow:hidden;margin-top:.25rem}
-.rtoolbar{padding:.6rem 1rem;border-bottom:0.5px solid var(--border);display:flex;align-items:center;gap:7px;flex-wrap:wrap}
-.rtoolbar span{font-size:11px;color:var(--text3);flex:1}
+.rtb{padding:.6rem 1rem;border-bottom:0.5px solid var(--border);display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.rtb-lbl{font-size:11px;color:var(--text3);flex:1}
 .spd-wrap{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text3)}
 .spd-wrap input{width:55px;accent-color:var(--text)}
 .rtext{padding:1.25rem;font-size:15px;color:#ccc;line-height:1.9;white-space:pre-wrap;font-family:Georgia,serif}
 .rtext.scroll-mode{overflow:hidden;max-height:200px}
 .rph{padding:1.75rem 1.25rem;text-align:center;color:var(--text4);font-size:12px}
-.gen-all-row{margin-bottom:.875rem}
-.gen-all-btn{width:100%;padding:8px;border:0.5px solid var(--border3);border-radius:8px;background:transparent;color:var(--text);font-size:13px;cursor:pointer;transition:all .12s;text-align:center}
-.gen-all-btn:hover:not(:disabled){background:var(--bg3)}
-.gen-all-btn:disabled{opacity:.4;cursor:not-allowed}
 .dots{display:flex;align-items:center;gap:7px;color:var(--text3);font-size:12px;padding:1.5rem 1.25rem}
 .dot{width:5px;height:5px;border-radius:50%;background:var(--text3);animation:blink 1.2s infinite}
 .dot:nth-child(2){animation-delay:.2s}.dot:nth-child(3){animation-delay:.4s}
 @keyframes blink{0%,80%,100%{opacity:.2}40%{opacity:1}}
-.toast{position:fixed;bottom:1.25rem;right:1.25rem;background:var(--bg4);border:0.5px solid var(--border2);border-radius:9px;padding:.65rem 1.1rem;font-size:12px;color:var(--text2);opacity:0;transform:translateY(6px);transition:all .2s;pointer-events:none;z-index:999}
+
+/* share modal */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;z-index:100;display:none}
+.overlay.open{display:flex}
+.modal{background:var(--bg2);border:0.5px solid var(--border2);border-radius:12px;padding:1.5rem;width:90%;max-width:560px;max-height:80vh;overflow-y:auto}
+.modal h2{font-size:15px;font-weight:500;color:var(--text);margin-bottom:1rem}
+.modal-close{float:right;background:none;border:none;color:var(--text3);cursor:pointer;font-size:18px;line-height:1;margin-top:-2px}
+.modal-close:hover{color:var(--text)}
+.share-text{width:100%;background:var(--bg3);border:0.5px solid var(--border);border-radius:8px;padding:1rem;color:var(--text2);font-size:13px;line-height:1.8;font-family:Georgia,serif;resize:none;outline:none;min-height:260px;margin-bottom:.75rem}
+.modal-actions{display:flex;gap:7px;flex-wrap:wrap}
+.mbtn{padding:7px 16px;border:0.5px solid var(--border2);border-radius:7px;background:transparent;color:var(--text2);font-size:13px;cursor:pointer;transition:all .12s}
+.mbtn:hover{background:var(--bg3);color:var(--text)}
+.mbtn.hi{border-color:var(--border3);color:var(--text)}
+
+/* toast */
+.toast{position:fixed;bottom:1.25rem;right:1.25rem;background:var(--bg4);border:0.5px solid var(--border2);border-radius:9px;padding:.65rem 1.1rem;font-size:12px;color:var(--text2);opacity:0;transform:translateY(6px);transition:all .2s;pointer-events:none;z-index:200}
 .toast.show{opacity:1;transform:translateY(0)}
 </style>
 </head>
 <body>
 <div class="app">
 
-<!-- ── SIDEBAR ── -->
+<!-- SIDEBAR -->
 <div class="sidebar">
-  <div class="sidebar-header">
+  <div class="sb-top">
     <h1>Gerador de Roteiro</h1>
-    <p>Importe slides e gere o texto de fala</p>
+    <div class="sb-actions">
+      <button class="sa-btn hi" onclick="newPresentation()">+ Nova</button>
+      <button class="sa-btn" onclick="savePresentation()">&#128190; Salvar</button>
+      <button class="sa-btn" onclick="openShare()">&#8679; Compartilhar</button>
+    </div>
   </div>
 
-  <!-- API KEY -->
-  <div class="api-section">
-    <div class="slabel">API Key Anthropic <span id="api-saved" class="api-saved" style="display:none">Salva</span></div>
+  <!-- API KEY colapsível -->
+  <div class="api-toggle-row" onclick="toggleApi()">
+    <span>API KEY <span id="api-saved" class="api-saved" style="display:none">● Salva</span></span>
+    <span class="arr" id="api-arr">&#9660;</span>
+  </div>
+  <div class="api-body" id="api-body">
     <div class="api-row">
       <input type="password" class="api-inp" id="api-key" placeholder="sk-ant-...">
       <button class="ib" onclick="toggleVis()">&#128065;</button>
@@ -164,54 +185,40 @@ body{background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,
   </div>
 
   <!-- SAVE / LOAD -->
-  <div class="saves-section">
+  <div class="save-section">
     <div class="slabel">Apresentações salvas</div>
-    <div class="saves-row" style="margin-bottom:5px">
-      <input type="text" class="saves-inp" id="save-name" placeholder="Nome da apresentação">
-      <button class="ib" onclick="savePresentation()" title="Salvar">&#128190;</button>
+    <div class="save-row">
+      <input type="text" class="si" id="save-name" placeholder="Nome da apresentação">
     </div>
-    <div class="saves-row">
-      <select class="saves-select" id="saves-select" onchange="previewLoad()">
-        <option value="">Carregar apresentação...</option>
+    <div class="save-row">
+      <select class="si" id="saves-select">
+        <option value="">Carregar salva...</option>
       </select>
       <button class="ib" onclick="loadPresentation()" title="Carregar">&#128193;</button>
-      <button class="ib" onclick="deletePresentation()" title="Excluir" style="color:var(--red)">&#128465;</button>
+      <button class="ib" onclick="deletePresentation()" title="Excluir" style="color:var(--red)">&#215;</button>
     </div>
   </div>
 
-  <!-- IMPORT -->
+  <!-- IMPORT PDF -->
   <div class="import-section">
-    <div class="slabel">Importar slides</div>
-    <div class="itabs">
-      <button class="itab active" onclick="switchTab('paste')">Colar texto</button>
-      <button class="itab" onclick="switchTab('pdf')">PDF</button>
+    <div class="slabel">Importar PDF</div>
+    <div class="drop-zone" id="drop-zone" onclick="document.getElementById('pdf-file').click()" ondragover="onDragOver(event)" ondrop="onDrop(event)" ondragleave="onDragLeave()">
+      <input type="file" id="pdf-file" accept=".pdf" onchange="loadPdf(event)">
+      <div id="drop-label">Clique ou arraste um PDF aqui</div>
     </div>
-
-    <div class="ibody active" id="tab-paste">
-      <textarea class="iinp itarea" id="paste-text" placeholder="Cole aqui o conteúdo do seu Canva ou apresentação (texto copiado dos slides)..."></textarea>
-      <button class="ibtn" id="paste-btn" onclick="importPaste()">Extrair slides do texto</button>
-      <div class="istatus" id="paste-status"></div>
-    </div>
-
-    <div class="ibody" id="tab-pdf">
-      <div class="drop-zone" id="drop-zone" onclick="document.getElementById('pdf-file').click()" ondragover="onDragOver(event)" ondrop="onDrop(event)" ondragleave="onDragLeave()">
-        <input type="file" id="pdf-file" accept=".pdf" onchange="loadPdf(event)">
-        <div id="drop-label">Clique ou arraste um PDF aqui</div>
-      </div>
-      <button class="ibtn" id="pdf-btn" onclick="importPdf()" disabled>Extrair slides do PDF</button>
-      <div class="istatus" id="pdf-status"></div>
-    </div>
+    <button class="ibtn" id="pdf-btn" onclick="importPdf()" disabled>Extrair slides do PDF</button>
+    <div class="istatus" id="pdf-status"></div>
   </div>
 
-  <!-- SLIDES LIST -->
-  <div class="slides-header">
+  <!-- SLIDES -->
+  <div class="slides-hdr">
     <span id="slide-count">0 slides</span>
     <button class="add-btn" onclick="addSlide()">+ Slide</button>
   </div>
   <div class="slides-list" id="slides-list"></div>
 </div>
 
-<!-- ── MAIN ── -->
+<!-- MAIN -->
 <div class="main">
   <div class="pbar"><div class="pfill" id="pf"></div></div>
 
@@ -222,15 +229,15 @@ body{background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,
     <button class="btn" id="done-btn" onclick="markDone()" disabled>Praticado</button>
     <span class="done-badge" id="done-badge">Praticado</span>
     <div class="timers">
-      <div class="tim"><span class="tim-label">slide</span><span class="tim-val" id="slide-timer">0:00</span></div>
-      <div class="tim"><span class="tim-label">total</span><span class="tim-val" id="total-timer">0:00</span></div>
+      <div class="tim"><span class="tim-lbl">slide</span><span class="tim-val" id="stimer">0:00</span></div>
+      <div class="tim"><span class="tim-lbl">total</span><span class="tim-val" id="ttimer">0:00</span></div>
     </div>
   </div>
 
   <div class="main-body">
     <div class="empty" id="empty-state">
       <h2>Nenhum slide adicionado</h2>
-      <p>Cole o conteúdo copiado do Canva,<br>importe um PDF, ou clique em <strong>+ Slide</strong>.</p>
+      <p>Importe um PDF ou clique em <strong>+ Slide</strong><br>para adicionar manualmente.</p>
     </div>
 
     <div class="editor" id="editor">
@@ -258,8 +265,8 @@ body{background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,
       </div>
 
       <div class="rbox">
-        <div class="rtoolbar">
-          <span>Roteiro de fala</span>
+        <div class="rtb">
+          <span class="rtb-lbl">Roteiro de fala</span>
           <div class="spd-wrap">vel. <input type="range" min="1" max="6" value="3" step="1" id="spd"> <span id="spd-val">3</span></div>
           <button class="btn" id="tp-btn" onclick="toggleTP()" disabled style="font-size:11px;padding:3px 9px">Teleprompter</button>
         </div>
@@ -269,6 +276,21 @@ body{background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,
   </div>
 </div>
 </div>
+
+<!-- SHARE MODAL -->
+<div class="overlay" id="overlay" onclick="closeShare(event)">
+  <div class="modal">
+    <button class="modal-close" onclick="closeShareBtn()">×</button>
+    <h2>Compartilhar roteiro</h2>
+    <textarea class="share-text" id="share-text" readonly></textarea>
+    <div class="modal-actions">
+      <button class="mbtn hi" onclick="copyShare()">Copiar texto</button>
+      <button class="mbtn" onclick="downloadShare()">Baixar .txt</button>
+      <button class="mbtn" onclick="closeShareBtn()">Fechar</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -279,6 +301,10 @@ const toast=(m,d=2500)=>{const el=document.getElementById('toast');el.textConten
 const getKey=()=>document.getElementById('api-key').value.trim()||localStorage.getItem('ant_key')||'';
 
 // ── API KEY ──
+function toggleApi(){
+  const body=document.getElementById('api-body'),arr=document.getElementById('api-arr');
+  body.classList.toggle('open');arr.classList.toggle('open');
+}
 function saveKey(){
   const k=document.getElementById('api-key').value.trim();
   if(!k){toast('Cole a API key primeiro');return}
@@ -293,55 +319,57 @@ function getSaves(){try{return JSON.parse(localStorage.getItem('presentations')|
 function setSaves(d){localStorage.setItem('presentations',JSON.stringify(d))}
 function refreshSavesList(){
   const sel=document.getElementById('saves-select');
-  const saves=getSaves();const keys=Object.keys(saves);
-  sel.innerHTML='<option value="">Carregar apresentação...</option>';
-  keys.forEach(k=>{const o=document.createElement('option');o.value=k;o.textContent=k+' ('+saves[k].slides.length+' slides)';sel.appendChild(o)});
+  const saves=getSaves();
+  sel.innerHTML='<option value="">Carregar salva...</option>';
+  Object.keys(saves).forEach(k=>{
+    const o=document.createElement('option');
+    o.value=k;o.textContent=k+' ('+saves[k].slides.length+'sl)';
+    sel.appendChild(o);
+  });
 }
-function previewLoad(){}
 function savePresentation(){
   const name=document.getElementById('save-name').value.trim();
-  if(!name){toast('Digite um nome para salvar');return}
+  if(!name){toast('Digite um nome');return}
   if(!slides.length){toast('Adicione slides primeiro');return}
   const saves=getSaves();
   saves[name]={slides:JSON.parse(JSON.stringify(slides)),savedAt:new Date().toISOString()};
   setSaves(saves);refreshSavesList();
   document.getElementById('saves-select').value=name;
-  toast('Apresentação "'+name+'" salva!');
+  toast('"'+name+'" salva!');
 }
 function loadPresentation(){
   const name=document.getElementById('saves-select').value;
   if(!name){toast('Selecione uma apresentação');return}
-  const saves=getSaves();
-  if(!saves[name]){toast('Não encontrada');return}
+  const saves=getSaves();if(!saves[name]){toast('Não encontrada');return}
   slides=JSON.parse(JSON.stringify(saves[name].slides));
   cur=-1;renderSidebar();
-  if(slides.length){selectSlide(0);document.getElementById('save-name').value=name}
-  toast('Apresentação "'+name+'" carregada!');
+  document.getElementById('save-name').value=name;
+  if(slides.length)selectSlide(0);
+  toast('"'+name+'" carregada!');
 }
 function deletePresentation(){
   const name=document.getElementById('saves-select').value;
   if(!name){toast('Selecione uma apresentação');return}
-  const saves=getSaves();delete saves[name];setSaves(saves);
-  refreshSavesList();toast('"'+name+'" excluída');
+  if(!confirm('Excluir "'+name+'"?'))return;
+  const saves=getSaves();delete saves[name];setSaves(saves);refreshSavesList();toast('Excluída!');
 }
-
-// ── IMPORT TABS ──
-function switchTab(t){
-  document.querySelectorAll('.itab').forEach((b,i)=>b.classList.toggle('active',['paste','pdf'][i]===t));
-  document.querySelectorAll('.ibody').forEach(b=>b.classList.remove('active'));
-  document.getElementById('tab-'+t).classList.add('active');
+function newPresentation(){
+  if(slides.length&&!confirm('Criar nova apresentação? Os slides atuais serão perdidos se não salvos.'))return;
+  slides=[];cur=-1;
+  document.getElementById('save-name').value='';
+  document.getElementById('saves-select').value='';
+  renderSidebar();showEmpty();
+  toast('Nova apresentação criada');
 }
-function setStatus(id,msg,cls){const el=document.getElementById(id);el.textContent=msg;el.className='istatus'+(cls?' '+cls:'')}
-function setLoading(btn,on,label){const b=document.getElementById(btn);b.disabled=on;b.textContent=on?'Extraindo...':label}
 
 // ── API CALL ──
 async function callApi(messages){
   const key=getKey();
-  if(!key)throw new Error('API key não configurada');
+  if(!key)throw new Error('API key não configurada — clique em API KEY para adicionar');
   const res=await fetch('https://api.anthropic.com/v1/messages',{
     method:'POST',
     headers:{'Content-Type':'application/json','anthropic-version':'2023-06-01','x-api-key':key,'anthropic-dangerous-direct-browser-access':'true'},
-    body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:4000,messages})
+    body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:6000,messages})
   });
   if(!res.ok){const e=await res.json().catch(()=>({error:{message:res.statusText}}));throw new Error(e.error?.message||'HTTP '+res.status)}
   const d=await res.json();
@@ -357,26 +385,7 @@ function parseSlideJSON(text){
   }catch{return null}
 }
 
-// ── PASTE IMPORT ──
-async function importPaste(){
-  const key=getKey();if(!key){toast('Salve a API key primeiro');return}
-  const text=document.getElementById('paste-text').value.trim();
-  if(!text){toast('Cole o conteúdo primeiro');return}
-  setLoading('paste-btn',true,'Extrair slides do texto');
-  setStatus('paste-status','Analisando...');
-  try{
-    const resp=await callApi([{role:'user',content:`Analise este conteúdo de uma apresentação e extraia os slides. Retorne SOMENTE JSON válido no formato:\n{"slides":[{"title":"...","sub":"...","bullets":"ponto 1\\nponto 2\\nponto 3"}]}\n\nConteúdo:\n${text}\n\nSem texto fora do JSON.`}]);
-    const list=parseSlideJSON(resp);
-    if(!list||!list.length)throw new Error('Não foi possível extrair os slides');
-    addImported(list);
-    setStatus('paste-status',list.length+' slides importados!','ok');
-    toast(list.length+' slides importados!');
-    document.getElementById('paste-text').value='';
-  }catch(e){setStatus('paste-status','Erro: '+e.message,'err');toast('Erro: '+e.message,3500)}
-  setLoading('paste-btn',false,'Extrair slides do texto');
-}
-
-// ── PDF IMPORT ──
+// ── PDF ──
 function onDragOver(e){e.preventDefault();document.getElementById('drop-zone').classList.add('drag')}
 function onDragLeave(){document.getElementById('drop-zone').classList.remove('drag')}
 function onDrop(e){e.preventDefault();onDragLeave();const f=e.dataTransfer.files[0];if(f&&f.type==='application/pdf')readPdf(f);else toast('Envie um PDF')}
@@ -387,29 +396,26 @@ function readPdf(file){
   r.onload=ev=>{pdfB64=ev.target.result.split(',')[1];document.getElementById('pdf-btn').disabled=false;setStatus('pdf-status','PDF carregado — clique em Extrair','ok')};
   r.readAsDataURL(file);
 }
+function setStatus(id,msg,cls){const el=document.getElementById(id);el.textContent=msg;el.className='istatus'+(cls?' '+cls:'')}
+
 async function importPdf(){
-  const key=getKey();if(!key){toast('Salve a API key primeiro');return}
   if(!pdfB64){toast('Carregue um PDF');return}
-  setLoading('pdf-btn',true,'Extrair slides do PDF');
+  const btn=document.getElementById('pdf-btn');
+  btn.disabled=true;btn.textContent='Extraindo...';
   setStatus('pdf-status','Analisando PDF...');
   try{
     const resp=await callApi([{role:'user',content:[
       {type:'document',source:{type:'base64',media_type:'application/pdf',data:pdfB64}},
-      {type:'text',text:'Este PDF é uma apresentação. Extraia todos os slides. Retorne SOMENTE JSON válido:\n{"slides":[{"title":"...","sub":"...","bullets":"ponto 1\\nponto 2\\nponto 3"}]}\nSem texto fora do JSON.'}
+      {type:'text',text:'Este PDF é uma apresentação. Extraia todos os slides. Retorne SOMENTE JSON válido, sem qualquer texto fora do JSON:\n{"slides":[{"title":"título do slide","sub":"subtítulo ou contexto","bullets":"ponto 1\\nponto 2\\nponto 3"}]}'}
     ]}]);
     const list=parseSlideJSON(resp);
-    if(!list||!list.length)throw new Error('Não foi possível extrair os slides');
-    addImported(list);
+    if(!list||!list.length)throw new Error('Não foi possível extrair — tente um PDF com texto selecionável');
+    list.forEach(s=>slides.push({id:Date.now()+Math.random(),title:s.title||'Slide',sub:s.sub||'',bullets:s.bullets||'',context:'',roteiro:null,done:false}));
+    renderSidebar();if(cur<0&&slides.length)selectSlide(0);
     setStatus('pdf-status',list.length+' slides importados!','ok');
     toast(list.length+' slides importados!');
   }catch(e){setStatus('pdf-status','Erro: '+e.message,'err');toast('Erro: '+e.message,3500)}
-  setLoading('pdf-btn',false,'Extrair slides do PDF');
-}
-
-function addImported(list){
-  list.forEach(s=>slides.push({id:Date.now()+Math.random(),title:s.title||'Slide',sub:s.sub||'',bullets:s.bullets||'',context:'',roteiro:null,done:false}));
-  renderSidebar();
-  if(cur<0&&slides.length>0)selectSlide(0);
+  btn.disabled=false;btn.textContent='Extrair slides do PDF';
 }
 
 // ── SLIDES ──
@@ -428,17 +434,16 @@ function renderSidebar(){
   const list=document.getElementById('slides-list');list.innerHTML='';
   slides.forEach((s,i)=>{
     const d=document.createElement('div');
-    d.className='slide-item'+(i===cur?' active':'');
+    d.className='si-item'+(i===cur?' active':'');
     d.onclick=()=>selectSlide(i);
     const sc=s.done?'done':s.roteiro?'ready':'';
     const st=s.done?'Praticado':s.roteiro?'Roteiro gerado':'Sem roteiro';
-    d.innerHTML=`<div class="si-top"><span class="si-num">${i+1}</span><span class="si-title">${s.title||'Sem título'}</span><button class="si-del" onclick="deleteSlide(${i},event)">×</button></div><div class="si-status ${sc}">${st}</div>`;
+    d.innerHTML=`<div class="si-top"><span class="si-num">${i+1}</span><span class="si-ttl">${s.title||'Sem título'}</span><button class="si-del" onclick="deleteSlide(${i},event)">×</button></div><div class="si-st ${sc}">${st}</div>`;
     list.appendChild(d);
   });
   const done=slides.filter(s=>s.done).length;
   document.getElementById('pf').style.width=(slides.length?done/slides.length*100:0)+'%';
-  const hasSlides=slides.length>0;
-  document.getElementById('gen-all-btn').disabled=!hasSlides;
+  document.getElementById('gen-all-btn').disabled=slides.length===0;
 }
 function showEmpty(){
   document.getElementById('empty-state').style.display='block';
@@ -458,7 +463,7 @@ function selectSlide(i){
   document.getElementById('f-sub').value=s.sub||'';
   document.getElementById('f-bullets').value=s.bullets||'';
   document.getElementById('f-ctx').value=s.context||'';
-  document.getElementById('tbar-title').textContent='Slide '+(i+1)+' / '+slides.length+' — '+(s.title||'');
+  document.getElementById('tbar-title').textContent=(i+1)+'/'+slides.length+' — '+(s.title||'');
   document.getElementById('gen-btn').disabled=false;
   document.getElementById('gen-btn').textContent=s.roteiro?'Regenerar':'Gerar roteiro';
   document.getElementById('done-btn').disabled=false;
@@ -476,66 +481,62 @@ function updateSlide(){
   slides[cur].sub=document.getElementById('f-sub').value;
   slides[cur].bullets=document.getElementById('f-bullets').value;
   slides[cur].context=document.getElementById('f-ctx').value;
-  document.getElementById('tbar-title').textContent='Slide '+(cur+1)+' / '+slides.length+' — '+(slides[cur].title||'');
+  document.getElementById('tbar-title').textContent=(cur+1)+'/'+slides.length+' — '+(slides[cur].title||'');
   renderSidebar();
 }
 function renderRoteiro(s){
   const body=document.getElementById('rbody'),btn=document.getElementById('tp-btn');
-  if(s.roteiro){body.innerHTML=`<div class="rtext" id="rt">${s.roteiro}</div>`;btn.disabled=false}
+  if(s.roteiro){body.innerHTML=`<div class="rtext" id="rt">${escHtml(s.roteiro)}</div>`;btn.disabled=false}
   else{body.innerHTML=`<div class="rph">O roteiro aparecerá aqui após a geração</div>`;btn.disabled=true}
 }
+function escHtml(t){return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
 
 // ── GENERATE ONE ──
 async function generateOne(){
-  const key=getKey();if(!key){toast('Salve a API key primeiro');return}
   if(cur<0)return;
   const s=slides[cur];
   const btn=document.getElementById('gen-btn');
   btn.disabled=true;btn.textContent='Gerando...';
   document.getElementById('tp-btn').disabled=true;
-  document.getElementById('rbody').innerHTML=`<div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div><span>Gerando roteiro...</span></div>`;
-  
-  // Build context of surrounding slides for better transitions
+  document.getElementById('rbody').innerHTML=`<div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div><span>Gerando...</span></div>`;
   const prev=cur>0?slides[cur-1]:null;
   const next=cur<slides.length-1?slides[cur+1]:null;
-  const prompt=`Você é um coach de apresentações profissionais. Gere um roteiro de fala em português para este slide.\n\n${prev?`Slide anterior: "${prev.title}"\n`:''}Slide atual (${cur+1} de ${slides.length}): "${s.title}"\n${s.sub?'Subtítulo: '+s.sub+'\n':''}${s.bullets?'Pontos:\n'+s.bullets.split('\n').filter(l=>l.trim()).map(l=>'- '+l.trim()).join('\n')+'\n':''}${s.context?'Contexto: '+s.context+'\n':''}${next?`Próximo slide: "${next.title}"\n`:''}\nInstruções: 80–130 palavras. Tom profissional e acolhedor. Soe natural em voz alta. Faça a transição fluir naturalmente para o próximo slide "${next?next.title:'encerramento'}". Retorne apenas o texto de fala.`;
-  
+  const prompt=`Você é um coach de apresentações. Gere um roteiro de fala em português.\n\n${prev?'Slide anterior: "'+prev.title+'"\n':''}Slide atual (${cur+1} de ${slides.length}): "${s.title}"\n${s.sub?'Subtítulo: '+s.sub+'\n':''}${s.bullets?'Pontos:\n'+s.bullets.split('\n').filter(l=>l.trim()).map(l=>'- '+l.trim()).join('\n')+'\n':''}${s.context?'Contexto: '+s.context+'\n':''}${next?'Próximo slide: "'+next.title+'"\n':''}\n80–130 palavras. Tom profissional e acolhedor. Natural em voz alta. Termine fluindo para "${next?next.title:'encerramento'}". Retorne apenas o texto de fala.`;
   try{
     const text=await callApi([{role:'user',content:prompt}]);
     slides[cur].roteiro=text;renderRoteiro(slides[cur]);renderSidebar();
     btn.textContent='Regenerar';toast('Roteiro gerado!');
   }catch(e){
-    document.getElementById('rbody').innerHTML=`<div class="rph" style="color:var(--red)">Erro: ${e.message}</div>`;
-    toast('Erro: '+e.message,3500);
+    document.getElementById('rbody').innerHTML=`<div class="rph" style="color:var(--red)">Erro: ${escHtml(e.message)}</div>`;
+    toast('Erro: '+e.message,4000);
   }
   btn.disabled=false;
 }
 
 // ── GENERATE ALL ──
 async function generateAll(){
-  const key=getKey();if(!key){toast('Salve a API key primeiro');return}
   if(!slides.length){toast('Adicione slides primeiro');return}
   const btn=document.getElementById('gen-all-btn');
-  btn.disabled=true;btn.textContent='Gerando todos...';
+  btn.disabled=true;btn.textContent='Gerando...';
 
-  // Build full presentation outline for connected narrative
-  const outline=slides.map((s,i)=>`Slide ${i+1}: ${s.title}${s.sub?' — '+s.sub:''}${s.bullets?'\n'+s.bullets.split('\n').filter(l=>l.trim()).map(l=>'  • '+l).join('\n'):''}`).join('\n\n');
+  const outline=slides.map((s,i)=>`Slide ${i+1}: ${s.title}${s.sub?' | '+s.sub:''}${s.bullets?'\n'+s.bullets.split('\n').filter(l=>l.trim()).map(l=>'  • '+l).join('\n'):''}`).join('\n\n');
 
-  const prompt=`Você é um coach de apresentações profissionais. Gere roteiros de fala em português para TODOS os slides de uma apresentação, garantindo que formem uma narrativa coesa e conectada.\n\nEstrutura completa da apresentação:\n${outline}\n\nInstruções:\n- Gere um roteiro para cada slide\n- Cada roteiro deve ter 80–120 palavras\n- Tom profissional e acolhedor, natural em voz alta\n- As transições entre slides devem ser fluidas e conectadas — o final de cada roteiro deve ligar naturalmente com o próximo\n- O primeiro slide deve ter uma abertura envolvente\n- O último slide deve ter um encerramento memorável\n\nRetorne SOMENTE JSON válido:\n{"roteiros":["texto do slide 1","texto do slide 2","texto do slide 3",...]}\nSem texto fora do JSON.`;
+  const prompt=`Você é um coach de apresentações. Gere roteiros de fala em português para todos os ${slides.length} slides, formando uma narrativa coesa e conectada.\n\nEstrutura:\n${outline}\n\nRegras:\n- Um roteiro por slide, na ordem correta\n- 80–120 palavras cada\n- Tom profissional e acolhedor, natural em voz alta\n- Final de cada roteiro deve fluir naturalmente para o próximo\n- Abertura envolvente no slide 1, encerramento memorável no último\n\nRetorne SOMENTE este JSON, sem qualquer texto fora dele:\n{"roteiros":["roteiro slide 1","roteiro slide 2","roteiro slide 3"]}`;
 
   try{
     const resp=await callApi([{role:'user',content:prompt}]);
     const clean=resp.replace(/```json|```/g,'').trim();
-    const s=clean.indexOf('{'),e=clean.lastIndexOf('}');
-    const json=JSON.parse(clean.slice(s,e+1));
-    if(!Array.isArray(json.roteiros))throw new Error('Formato inválido');
-    json.roteiros.forEach((r,i)=>{if(slides[i])slides[i].roteiro=r});
+    const start=clean.indexOf('{');const end=clean.lastIndexOf('}');
+    if(start===-1||end===-1)throw new Error('Resposta fora do formato esperado');
+    const json=JSON.parse(clean.slice(start,end+1));
+    if(!Array.isArray(json.roteiros)||json.roteiros.length===0)throw new Error('Array de roteiros vazio ou inválido');
+    json.roteiros.forEach((r,i)=>{if(slides[i]&&typeof r==='string'&&r.trim())slides[i].roteiro=r.trim()});
     renderSidebar();
     if(cur>=0)renderRoteiro(slides[cur]);
-    toast('Todos os roteiros gerados!');
     document.getElementById('gen-btn').textContent='Regenerar';
+    toast('Todos os '+json.roteiros.length+' roteiros gerados!');
   }catch(e){
-    toast('Erro ao gerar: '+e.message,3500);
+    toast('Erro ao gerar: '+e.message,4000);
   }
   btn.disabled=false;btn.textContent='Gerar todos';
 }
@@ -544,14 +545,14 @@ function markDone(){
   if(cur<0)return;slides[cur].done=true;
   document.getElementById('done-btn').style.display='none';
   document.getElementById('done-badge').style.display='inline-block';
-  renderSidebar();toast('Marcado como praticado!');
+  renderSidebar();toast('Praticado!');
 }
 
 // ── TIMERS ──
 function startTimers(){
-  clearInterval(sInt);sT=0;document.getElementById('slide-timer').textContent='0:00';
-  sInt=setInterval(()=>{sT++;document.getElementById('slide-timer').textContent=fmt(sT)},1000);
-  if(!tInt)tInt=setInterval(()=>{tT++;document.getElementById('total-timer').textContent=fmt(tT)},1000);
+  clearInterval(sInt);sT=0;document.getElementById('stimer').textContent='0:00';
+  sInt=setInterval(()=>{sT++;document.getElementById('stimer').textContent=fmt(sT)},1000);
+  if(!tInt)tInt=setInterval(()=>{tT++;document.getElementById('ttimer').textContent=fmt(tT)},1000);
 }
 
 // ── TELEPROMPTER ──
@@ -575,18 +576,53 @@ function toggleTP(){
 }
 document.getElementById('spd').addEventListener('input',e=>document.getElementById('spd-val').textContent=e.target.value);
 
-// ── KEYBOARD NAV ──
+// ── SHARE ──
+function buildShareText(){
+  const name=document.getElementById('save-name').value.trim()||'Apresentação';
+  let out=name.toUpperCase()+'\n'+'─'.repeat(name.length)+'\n\n';
+  slides.forEach((s,i)=>{
+    out+=`SLIDE ${i+1}: ${s.title}\n`;
+    if(s.sub)out+=`${s.sub}\n`;
+    out+='\n';
+    if(s.roteiro)out+=s.roteiro+'\n';
+    else out+='[Roteiro não gerado]\n';
+    out+='\n'+'─'.repeat(40)+'\n\n';
+  });
+  return out;
+}
+function openShare(){
+  if(!slides.length){toast('Adicione slides primeiro');return}
+  document.getElementById('share-text').value=buildShareText();
+  document.getElementById('overlay').classList.add('open');
+}
+function closeShare(e){if(e.target===document.getElementById('overlay'))closeShareBtn()}
+function closeShareBtn(){document.getElementById('overlay').classList.remove('open')}
+function copyShare(){
+  const t=document.getElementById('share-text');
+  t.select();
+  try{document.execCommand('copy');toast('Copiado!')}
+  catch{navigator.clipboard.writeText(t.value).then(()=>toast('Copiado!')).catch(()=>toast('Selecione e copie manualmente'))}
+}
+function downloadShare(){
+  const name=(document.getElementById('save-name').value.trim()||'roteiro').replace(/\s+/g,'_');
+  const blob=new Blob([document.getElementById('share-text').value],{type:'text/plain;charset=utf-8'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name+'.txt';
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
+  toast('Download iniciado!');
+}
+
+// ── KEYBOARD ──
 document.addEventListener('keydown',e=>{
   if(['INPUT','TEXTAREA'].includes(e.target.tagName))return;
   if(e.key==='ArrowRight'||e.key==='ArrowDown')navigate(1);
   if(e.key==='ArrowLeft'||e.key==='ArrowUp')navigate(-1);
+  if(e.key==='Escape')closeShareBtn();
 });
 
 // ── INIT ──
-const savedKey=localStorage.getItem('ant_key');
-if(savedKey){document.getElementById('api-key').value=savedKey;document.getElementById('api-saved').style.display='inline'}
-refreshSavesList();
-showEmpty();
+const sk=localStorage.getItem('ant_key');
+if(sk){document.getElementById('api-key').value=sk;document.getElementById('api-saved').style.display='inline'}
+refreshSavesList();showEmpty();
 </script>
 </body>
 </html>
