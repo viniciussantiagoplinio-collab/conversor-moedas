@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gerador de Roteiro — Apresentações</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0a0a;--bg2:#111;--bg3:#161616;--bg4:#1a1a1a;
+  --border:#252525;--border2:#2e2e2e;
+  --text:#e8e8e8;--text2:#aaa;--text3:#666;--text4:#444;
+  --green:#4a9e6a;--green-bg:#0e1e14;
+  --red:#c0453a;--red-bg:#1e0e0e;
+  --blue:#5a8fd4;
+}
+body{background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,sans-serif;min-height:100vh}
+.app{display:grid;grid-template-columns:330px 1fr;min-height:100vh}
+@media(max-width:768px){.app{grid-template-columns:1fr}}
+
+.sidebar{background:var(--bg2);border-right:0.5px solid var(--border);display:flex;flex-direction:column;overflow:hidden;min-height:100vh}
+.sidebar-header{padding:1.25rem 1rem .875rem;border-bottom:0.5px solid var(--border)}
+.sidebar-header h1{font-size:15px;font-weight:500;color:var(--text);margin-bottom:2px}
+.sidebar-header p{font-size:12px;color:var(--text3)}
+
+.api-section{padding:.875rem 1rem;border-bottom:0.5px solid var(--border)}
+.section-label{font-size:11px;color:var(--text4);margin-bottom:7px;letter-spacing:.04em;display:flex;align-items:center;justify-content:space-between}
+.api-link{font-size:11px;color:var(--blue);text-decoration:none}
+.api-link:hover{text-decoration:underline}
+.api-saved{font-size:10px;color:var(--green)}
+.api-row{display:flex;gap:6px;margin-bottom:6px}
+.api-input{flex:1;background:var(--bg3);border:0.5px solid var(--border2);border-radius:8px;padding:7px 10px;color:var(--text);font-size:12px;font-family:monospace;outline:none}
+.api-input:focus{border-color:var(--text4)}
+.icon-btn{background:var(--bg3);border:0.5px solid var(--border2);border-radius:8px;color:var(--text3);cursor:pointer;padding:0 10px;font-size:13px}
+.icon-btn:hover{background:var(--bg4)}
+.api-hint{font-size:11px;color:var(--text4);line-height:1.5}
+
+.import-section{padding:.875rem 1rem;border-bottom:0.5px solid var(--border)}
+.import-tabs{display:flex;gap:4px;margin-bottom:8px}
+.itab{flex:1;padding:5px 0;border:0.5px solid var(--border2);border-radius:6px;background:transparent;color:var(--text3);font-size:12px;cursor:pointer;text-align:center;transition:all .15s}
+.itab.active{background:var(--bg3);color:var(--text2);border-color:#444}
+.import-body{display:none}
+.import-body.active{display:block}
+.url-input{width:100%;background:var(--bg3);border:0.5px solid var(--border2);border-radius:8px;padding:7px 10px;color:var(--text);font-size:12px;outline:none;margin-bottom:6px}
+.url-input:focus{border-color:var(--text4)}
+.url-input::placeholder{color:var(--text4)}
+.import-btn{width:100%;padding:7px;background:transparent;border:0.5px solid var(--border2);border-radius:8px;color:var(--text2);font-size:12px;cursor:pointer;transition:all .15s;text-align:center}
+.import-btn:hover:not(:disabled){background:var(--bg3);color:var(--text)}
+.import-btn:disabled{opacity:.4;cursor:not-allowed}
+.drop-zone{border:0.5px dashed var(--border2);border-radius:8px;padding:1.25rem;text-align:center;color:var(--text4);font-size:12px;cursor:pointer;transition:all .15s;margin-bottom:6px}
+.drop-zone:hover,.drop-zone.drag{border-color:#555;color:var(--text3);background:var(--bg3)}
+.drop-zone input{display:none}
+.import-status{font-size:11px;color:var(--text3);margin-top:5px;min-height:16px;line-height:1.4}
+.import-status.ok{color:var(--green)}
+.import-status.err{color:var(--red)}
+
+.slides-header{padding:.75rem 1rem .5rem;display:flex;align-items:center;justify-content:space-between}
+.slides-header span{font-size:12px;color:var(--text3)}
+.add-btn{background:transparent;border:0.5px solid var(--border2);border-radius:6px;color:var(--text2);font-size:12px;padding:4px 10px;cursor:pointer}
+.add-btn:hover{background:var(--bg3)}
+.slides-list{flex:1;overflow-y:auto;padding:.5rem}
+.slide-item{background:var(--bg3);border:0.5px solid var(--border);border-radius:10px;padding:.875rem;margin-bottom:.5rem;cursor:pointer;transition:border-color .15s}
+.slide-item:hover{border-color:var(--border2)}
+.slide-item.active{border-color:#555}
+.slide-item-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.slide-num{font-size:10px;color:var(--text4);flex-shrink:0;margin-top:2px}
+.slide-title-preview{font-size:13px;color:var(--text);font-weight:500;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.slide-del{background:none;border:none;color:var(--text4);cursor:pointer;font-size:16px;padding:0;flex-shrink:0;line-height:1}
+.slide-del:hover{color:var(--red)}
+.slide-status{font-size:10px;color:var(--text4);margin-top:4px}
+.slide-status.done{color:var(--green)}
+.slide-status.ready{color:var(--text3)}
+
+.main{display:flex;flex-direction:column;overflow:hidden}
+.progress-bar{height:2px;background:var(--border)}
+.progress-fill{height:100%;background:var(--text3);transition:width .3s}
+.main-toolbar{padding:.875rem 1.25rem;border-bottom:0.5px solid var(--border);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.tbar-title{font-size:13px;color:var(--text2);flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.btn{padding:6px 14px;border:0.5px solid var(--border2);border-radius:8px;background:transparent;color:var(--text2);font-size:13px;cursor:pointer;transition:all .15s;white-space:nowrap}
+.btn:hover:not(:disabled){background:var(--bg3);color:var(--text)}
+.btn:disabled{opacity:.3;cursor:not-allowed}
+.done-badge{font-size:11px;padding:3px 9px;border-radius:6px;background:var(--green-bg);color:var(--green);display:none}
+.timer-wrap{display:flex;gap:14px;margin-left:auto}
+.timer-item{text-align:right}
+.timer-label{font-size:10px;color:var(--text4);display:block}
+.timer-val{font-size:13px;font-weight:500;color:var(--text2);font-family:monospace}
+
+.main-content{flex:1;overflow-y:auto;padding:1.25rem}
+.empty{text-align:center;padding:4rem 2rem;color:var(--text3)}
+.empty h2{font-size:16px;font-weight:400;margin-bottom:.5rem;color:var(--text2)}
+.empty p{font-size:13px;line-height:1.6}
+
+.slide-editor{display:none;flex-direction:column;gap:1rem}
+.slide-editor.visible{display:flex}
+.field-label{font-size:11px;color:var(--text3);margin-bottom:6px;display:block;letter-spacing:.04em}
+.field-input{width:100%;background:var(--bg3);border:0.5px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text);font-size:14px;outline:none;transition:border-color .15s;font-family:inherit}
+.field-input:focus{border-color:#555}
+.field-textarea{resize:vertical;min-height:90px;line-height:1.6;font-size:13px}
+
+.roteiro-box{background:var(--bg2);border:0.5px solid var(--border);border-radius:10px;overflow:hidden;margin-top:.5rem}
+.roteiro-toolbar{padding:.75rem 1rem;border-bottom:0.5px solid var(--border);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.roteiro-toolbar span{font-size:12px;color:var(--text3);flex:1}
+.speed-wrap{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text3)}
+.speed-wrap input{width:60px;accent-color:var(--text)}
+.roteiro-text{padding:1.25rem;font-size:15px;color:#ccc;line-height:1.9;white-space:pre-wrap;font-family:Georgia,serif}
+.roteiro-text.scroll-mode{overflow:hidden;max-height:200px}
+.roteiro-ph{padding:2rem 1.25rem;text-align:center;color:var(--text4);font-size:13px}
+.generating{display:flex;align-items:center;gap:8px;color:var(--text3);font-size:13px;padding:1.5rem 1.25rem}
+.dot{width:5px;height:5px;border-radius:50%;background:var(--text3);animation:blink 1.2s infinite}
+.dot:nth-child(2){animation-delay:.2s}.dot:nth-child(3){animation-delay:.4s}
+@keyframes blink{0%,80%,100%{opacity:.2}40%{opacity:1}}
+
+.toast{position:fixed;bottom:1.5rem;right:1.5rem;background:var(--bg4);border:0.5px solid var(--border2);border-radius:10px;padding:.75rem 1.25rem;font-size:13px;color:var(--text2);opacity:0;transform:translateY(8px);transition:all .25s;pointer-events:none;z-index:999}
+.toast.show{opacity:1;transform:translateY(0)}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <h1>Gerador de Roteiro</h1>
+      <p>Importe slides ou adicione manualmente</p>
+    </div>
+
+    <div class="api-section">
+      <div class="section-label">
+        API Key Anthropic
+        <span id="api-saved" class="api-saved" style="display:none">Salva</span>
+      </div>
+      <div class="api-row">
+        <input type="password" class="api-input" id="api-key" placeholder="sk-ant-...">
+        <button class="icon-btn" onclick="toggleVis()" title="Mostrar/ocultar">&#128065;</button>
+        <button class="icon-btn" onclick="saveKey()" title="Salvar">&#10003;</button>
+      </div>
+      <div class="api-hint">
+        Obtenha em <a class="api-link" href="https://console.anthropic.com/settings/keys" target="_blank">console.anthropic.com → API Keys</a>.
+        A chave fica salva só no seu navegador.
+      </div>
+    </div>
+
+    <div class="import-section">
+      <div class="section-label">Importar slides</div>
+      <div class="import-tabs">
+        <button class="itab active" onclick="switchTab('url')">Link Canva</button>
+        <button class="itab" onclick="switchTab('pdf')">PDF</button>
+      </div>
+
+      <div class="import-body active" id="tab-url">
+        <input type="text" class="url-input" id="canva-url" placeholder="https://www.canva.com/design/...">
+        <button class="import-btn" id="url-btn" onclick="importUrl()">Extrair slides do link</button>
+        <div class="import-status" id="url-status"></div>
+      </div>
+
+      <div class="import-body" id="tab-pdf">
+        <div class="drop-zone" id="drop-zone" onclick="document.getElementById('pdf-file').click()" ondragover="onDragOver(event)" ondrop="onDrop(event)" ondragleave="onDragLeave()">
+          <input type="file" id="pdf-file" accept=".pdf" onchange="loadPdf(event)">
+          <div id="drop-label">Clique ou arraste um PDF aqui</div>
+        </div>
+        <button class="import-btn" id="pdf-btn" onclick="importPdf()" disabled>Extrair slides do PDF</button>
+        <div class="import-status" id="pdf-status"></div>
+      </div>
+    </div>
+
+    <div class="slides-header">
+      <span id="slide-count">0 slides</span>
+      <button class="add-btn" onclick="addSlide()">+ Slide</button>
+    </div>
+    <div class="slides-list" id="slides-list"></div>
+  </div>
+
+  <div class="main">
+    <div class="progress-bar"><div class="progress-fill" id="pf"></div></div>
+    <div class="main-toolbar">
+      <span class="tbar-title" id="tbar-title">Selecione um slide</span>
+      <button class="btn" id="gen-btn" onclick="generateScript()" disabled>Gerar roteiro</button>
+      <button class="btn" id="done-btn" onclick="markDone()" disabled>Praticado</button>
+      <span class="done-badge" id="done-badge">Praticado</span>
+      <div class="timer-wrap">
+        <div class="timer-item"><span class="timer-label">slide</span><span class="timer-val" id="slide-timer">0:00</span></div>
+        <div class="timer-item"><span class="timer-label">total</span><span class="timer-val" id="total-timer">0:00</span></div>
+      </div>
+    </div>
+    <div class="main-content">
+      <div class="empty" id="empty-state">
+        <h2>Nenhum slide adicionado</h2>
+        <p>Importe um PDF ou link do Canva,<br>ou clique em <strong>+ Slide</strong> para adicionar manualmente.</p>
+      </div>
+      <div class="slide-editor" id="slide-editor">
+        <div>
+          <label class="field-label">Título do slide</label>
+          <input type="text" class="field-input" id="field-title" placeholder="Ex: Honorários de Pré-Serviço" oninput="updateSlide()">
+        </div>
+        <div>
+          <label class="field-label">Subtítulo <span style="color:var(--text4)">(opcional)</span></label>
+          <input type="text" class="field-input" id="field-sub" placeholder="Ex: R$15.000 em 5 parcelas" oninput="updateSlide()">
+        </div>
+        <div>
+          <label class="field-label">Pontos do slide</label>
+          <textarea class="field-input field-textarea" id="field-bullets" placeholder="Um ponto por linha" oninput="updateSlide()"></textarea>
+        </div>
+        <div>
+          <label class="field-label">Contexto adicional <span style="color:var(--text4)">(opcional)</span></label>
+          <textarea class="field-input field-textarea" id="field-context" placeholder="Instruções de tom, ênfase ou público-alvo" oninput="updateSlide()" style="min-height:60px"></textarea>
+        </div>
+        <div class="roteiro-box">
+          <div class="roteiro-toolbar">
+            <span>Roteiro de fala</span>
+            <div class="speed-wrap">vel. <input type="range" min="1" max="6" value="3" step="1" id="spd"> <span id="spd-val">3</span></div>
+            <button class="btn" id="tp-btn" onclick="toggleTP()" disabled style="font-size:12px;padding:4px 10px">Teleprompter</button>
+          </div>
+          <div id="roteiro-body"><div class="roteiro-ph">O roteiro aparecerá aqui após a geração</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+let slides=[],cur=-1,sT=0,tT=0,sInt=null,tInt=null,scrollInt=null,isScrolling=false,pdfB64=null;
+
+const fmt=s=>Math.floor(s/60)+':'+(s%60<10?'0':'')+s%60;
+const toast=(m,d=2500)=>{const el=document.getElementById('toast');el.textContent=m;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),d)};
+const getKey=()=>document.getElementById('api-key').value.trim()||localStorage.getItem('ant_key')||'';
+
+function saveKey(){
+  const k=document.getElementById('api-key').value.trim();
+  if(!k){toast('Cole a API key primeiro');return}
+  localStorage.setItem('ant_key',k);
+  document.getElementById('api-saved').style.display='inline';
+  toast('Chave salva!');
+}
+function toggleVis(){const i=document.getElementById('api-key');i.type=i.type==='password'?'text':'password'}
+function switchTab(t){
+  document.querySelectorAll('.itab').forEach((b,i)=>b.classList.toggle('active',['url','pdf'][i]===t));
+  document.querySelectorAll('.import-body').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+t).classList.add('active');
+}
+
+function onDragOver(e){e.preventDefault();document.getElementById('drop-zone').classList.add('drag')}
+function onDragLeave(){document.getElementById('drop-zone').classList.remove('drag')}
+function onDrop(e){e.preventDefault();onDragLeave();const f=e.dataTransfer.files[0];if(f&&f.type==='application/pdf')readPdf(f);else toast('Envie um arquivo PDF')}
+function loadPdf(e){const f=e.target.files[0];if(f)readPdf(f)}
+function readPdf(file){
+  document.getElementById('drop-label').textContent=file.name;
+  const r=new FileReader();
+  r.onload=ev=>{
+    pdfB64=ev.target.result.split(',')[1];
+    document.getElementById('pdf-btn').disabled=false;
+    setStatus('pdf','PDF carregado — clique em Extrair','ok');
+  };
+  r.readAsDataURL(file);
+}
+
+function setStatus(tab,msg,cls){
+  const el=document.getElementById(tab+'-status');
+  el.textContent=msg;el.className='import-status'+(cls?' '+cls:'');
+}
+function setLoading(tab,on,defaultLabel){
+  const btn=document.getElementById(tab+'-btn');
+  btn.disabled=on;btn.textContent=on?'Extraindo...':defaultLabel;
+  if(on)setStatus(tab,'Analisando...');
+}
+
+async function callApi(key,messages,tools){
+  const body={model:'claude-sonnet-4-20250514',max_tokens:3000,messages};
+  if(tools)body.tools=tools;
+  const res=await fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',
+    headers:{'Content-Type':'application/json','anthropic-version':'2023-06-01','x-api-key':key,'anthropic-dangerous-direct-browser-access':'true'},
+    body:JSON.stringify(body)
+  });
+  if(!res.ok){const e=await res.json().catch(()=>({error:{message:res.statusText}}));throw new Error(e.error?.message||'HTTP '+res.status)}
+  const d=await res.json();
+  return d.content?.find(b=>b.type==='text')?.text||'';
+}
+
+function parseJSON(text){
+  try{
+    const c=text.replace(/```json|```/g,'').trim();
+    const s=c.indexOf('{'),e=c.lastIndexOf('}');
+    const j=JSON.parse(c.slice(s,e+1));
+    return Array.isArray(j.slides)?j.slides:null;
+  }catch{return null}
+}
+
+function addImported(list){
+  list.forEach(s=>{
+    slides.push({id:Date.now()+Math.random(),title:s.title||'Slide',sub:s.sub||'',bullets:s.bullets||'',context:'',roteiro:null,done:false});
+  });
+  renderSidebar();
+  if(cur<0&&slides.length>0)selectSlide(0);
+}
+
+async function importUrl(){
+  const key=getKey();if(!key){toast('Salve a API key primeiro');return}
+  const url=document.getElementById('canva-url').value.trim();
+  if(!url){toast('Cole o link');return}
+  setLoading('url',true,'Extrair slides do link');
+  try{
+    const text=await callApi(key,
+      [{role:'user',content:`Acesse e analise a apresentação neste link: ${url}\n\nExtraia todos os slides. Retorne SOMENTE JSON válido:\n{"slides":[{"title":"...","sub":"...","bullets":"ponto 1\\nponto 2\\nponto 3"}]}\nSem texto fora do JSON.`}],
+      [{type:'web_search_20250305',name:'web_search'}]
+    );
+    const list=parseJSON(text);
+    if(!list)throw new Error('Não foi possível extrair slides — tente um PDF');
+    addImported(list);
+    setStatus('url',list.length+' slides importados!','ok');
+    toast(list.length+' slides importados!');
+  }catch(e){setStatus('url','Erro: '+e.message,'err');toast('Erro: '+e.message,3500)}
+  setLoading('url',false,'Extrair slides do link');
+}
+
+async function importPdf(){
+  const key=getKey();if(!key){toast('Salve a API key primeiro');return}
+  if(!pdfB64){toast('Carregue um PDF');return}
+  setLoading('pdf',true,'Extrair slides do PDF');
+  try{
+    const text=await callApi(key,[{role:'user',content:[
+      {type:'document',source:{type:'base64',media_type:'application/pdf',data:pdfB64}},
+      {type:'text',text:'Este PDF é uma apresentação. Extraia todos os slides com título, subtítulo e pontos principais. Retorne SOMENTE JSON válido:\n{"slides":[{"title":"...","sub":"...","bullets":"ponto 1\\nponto 2\\nponto 3"}]}\nSem texto fora do JSON.'}
+    ]}]);
+    const list=parseJSON(text);
+    if(!list)throw new Error('Não foi possível extrair os slides');
+    addImported(list);
+    setStatus('pdf',list.length+' slides importados!','ok');
+    toast(list.length+' slides importados!');
+  }catch(e){setStatus('pdf','Erro: '+e.message,'err');toast('Erro: '+e.message,3500)}
+  setLoading('pdf',false,'Extrair slides do PDF');
+}
+
+function addSlide(){
+  slides.push({id:Date.now(),title:'Novo slide',sub:'',bullets:'',context:'',roteiro:null,done:false});
+  renderSidebar();selectSlide(slides.length-1);
+}
+function deleteSlide(i,e){
+  e.stopPropagation();slides.splice(i,1);
+  if(cur>=slides.length)cur=slides.length-1;
+  renderSidebar();
+  if(!slides.length){cur=-1;showEmpty()}else selectSlide(cur);
+}
+function renderSidebar(){
+  document.getElementById('slide-count').textContent=slides.length+' slide'+(slides.length!==1?'s':'');
+  const list=document.getElementById('slides-list');list.innerHTML='';
+  slides.forEach((s,i)=>{
+    const d=document.createElement('div');
+    d.className='slide-item'+(i===cur?' active':'');
+    d.onclick=()=>selectSlide(i);
+    const st=s.done?'done':s.roteiro?'ready':'';
+    const stTxt=s.done?'Praticado':s.roteiro?'Roteiro gerado':'Sem roteiro';
+    d.innerHTML=`<div class="slide-item-top"><span class="slide-num">Slide ${i+1}</span><span class="slide-title-preview">${s.title||'Sem título'}</span><button class="slide-del" onclick="deleteSlide(${i},event)">×</button></div><div class="slide-status ${st}">${stTxt}</div>`;
+    list.appendChild(d);
+  });
+  const done=slides.filter(s=>s.done).length;
+  document.getElementById('pf').style.width=(slides.length?done/slides.length*100:0)+'%';
+}
+function showEmpty(){
+  document.getElementById('empty-state').style.display='block';
+  document.getElementById('slide-editor').classList.remove('visible');
+  document.getElementById('tbar-title').textContent='Selecione um slide';
+  document.getElementById('gen-btn').disabled=true;
+  document.getElementById('done-btn').disabled=true;
+  document.getElementById('done-badge').style.display='none';
+}
+function selectSlide(i){
+  cur=i;const s=slides[i];
+  document.getElementById('empty-state').style.display='none';
+  document.getElementById('slide-editor').classList.add('visible');
+  document.getElementById('field-title').value=s.title||'';
+  document.getElementById('field-sub').value=s.sub||'';
+  document.getElementById('field-bullets').value=s.bullets||'';
+  document.getElementById('field-context').value=s.context||'';
+  document.getElementById('tbar-title').textContent='Slide '+(i+1)+' de '+slides.length;
+  document.getElementById('gen-btn').disabled=false;
+  document.getElementById('gen-btn').textContent=s.roteiro?'Regenerar':'Gerar roteiro';
+  document.getElementById('done-btn').disabled=false;
+  document.getElementById('done-btn').style.display=s.done?'none':'inline-block';
+  document.getElementById('done-badge').style.display=s.done?'inline-block':'none';
+  renderRoteiro(s);renderSidebar();stopTP();startTimers();
+}
+function updateSlide(){
+  if(cur<0)return;
+  slides[cur].title=document.getElementById('field-title').value;
+  slides[cur].sub=document.getElementById('field-sub').value;
+  slides[cur].bullets=document.getElementById('field-bullets').value;
+  slides[cur].context=document.getElementById('field-context').value;
+  renderSidebar();
+}
+function renderRoteiro(s){
+  const body=document.getElementById('roteiro-body'),btn=document.getElementById('tp-btn');
+  if(s.roteiro){body.innerHTML=`<div class="roteiro-text" id="rt">${s.roteiro}</div>`;btn.disabled=false}
+  else{body.innerHTML=`<div class="roteiro-ph">O roteiro aparecerá aqui após a geração</div>`;btn.disabled=true}
+}
+async function generateScript(){
+  const key=getKey();if(!key){toast('Salve a API key primeiro');return}
+  if(cur<0)return;
+  const s=slides[cur];
+  const btn=document.getElementById('gen-btn');
+  btn.disabled=true;btn.textContent='Gerando...';
+  document.getElementById('tp-btn').disabled=true;
+  document.getElementById('roteiro-body').innerHTML=`<div class="generating"><div class="dot"></div><div class="dot"></div><div class="dot"></div><span>Gerando roteiro...</span></div>`;
+  const prompt=`Você é um coach de apresentações profissionais. Gere um roteiro de fala em português.\n\nTítulo: ${s.title||'Slide'}\n${s.sub?'Subtítulo: '+s.sub+'\n':''}${s.bullets?'Pontos:\n'+s.bullets.split('\n').filter(l=>l.trim()).map(l=>'- '+l.trim()).join('\n')+'\n':''}${s.context?'Contexto: '+s.context+'\n':''}\nInstruções: 80–130 palavras. Tom profissional e acolhedor. Natural falado em voz alta. Termine com transição para o próximo slide. Retorne apenas o texto de fala.`;
+  try{
+    const text=await callApi(key,[{role:'user',content:prompt}]);
+    slides[cur].roteiro=text;renderRoteiro(slides[cur]);renderSidebar();
+    btn.textContent='Regenerar';toast('Roteiro gerado!');
+  }catch(e){
+    document.getElementById('roteiro-body').innerHTML=`<div class="roteiro-ph" style="color:var(--red)">Erro: ${e.message}</div>`;
+    toast('Erro: '+e.message,3500);
+  }
+  btn.disabled=false;
+}
+function markDone(){
+  if(cur<0)return;slides[cur].done=true;
+  document.getElementById('done-btn').style.display='none';
+  document.getElementById('done-badge').style.display='inline-block';
+  renderSidebar();toast('Marcado como praticado!');
+}
+function startTimers(){
+  clearInterval(sInt);sT=0;document.getElementById('slide-timer').textContent='0:00';
+  sInt=setInterval(()=>{sT++;document.getElementById('slide-timer').textContent=fmt(sT)},1000);
+  if(!tInt)tInt=setInterval(()=>{tT++;document.getElementById('total-timer').textContent=fmt(tT)},1000);
+}
+function stopTP(){
+  isScrolling=false;clearInterval(scrollInt);
+  const btn=document.getElementById('tp-btn');if(btn)btn.textContent='Teleprompter';
+  const el=document.getElementById('rt');if(el)el.classList.remove('scroll-mode');
+}
+function toggleTP(){
+  isScrolling=!isScrolling;
+  const btn=document.getElementById('tp-btn'),el=document.getElementById('rt');
+  if(!el)return;
+  if(isScrolling){
+    btn.textContent='Parar';el.classList.add('scroll-mode');el.scrollTop=0;
+    clearInterval(scrollInt);
+    scrollInt=setInterval(()=>{
+      el.scrollTop+=parseInt(document.getElementById('spd').value);
+      if(el.scrollTop>=el.scrollHeight-el.clientHeight-4){isScrolling=false;clearInterval(scrollInt);btn.textContent='Teleprompter';el.classList.remove('scroll-mode')}
+    },60);
+  }else{clearInterval(scrollInt);btn.textContent='Teleprompter';el.classList.remove('scroll-mode')}
+}
+document.getElementById('spd').addEventListener('input',e=>document.getElementById('spd-val').textContent=e.target.value);
+const saved=localStorage.getItem('ant_key');
+if(saved){document.getElementById('api-key').value=saved;document.getElementById('api-saved').style.display='inline'}
+showEmpty();
+</script>
+</body>
+</html>
