@@ -8,7 +8,7 @@
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  /* ── Tema Claro (padrão Notion) ── */
+  /* ── Tema Claro ── */
   :root {
     --bg: #ffffff;
     --surface: #f7f6f3;
@@ -28,12 +28,15 @@
     --error-text: #c0392b;
     --success: #4caf50;
     --warning: #f59e0b;
+    --search: #8b5cf6;
+    --search-bg: #f3efff;
+    --search-border: #d9ccff;
     --input-focus: #b0b0a8;
     --radius: 6px;
     --font: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   }
 
-  /* ── Tema Escuro (Notion Dark) ── */
+  /* ── Tema Escuro ── */
   [data-theme="dark"] {
     --bg: #191919;
     --surface: #2f2f2f;
@@ -53,10 +56,12 @@
     --error-text: #ff8080;
     --success: #6fcf7e;
     --warning: #f5b041;
+    --search: #a78bfa;
+    --search-bg: #2d2244;
+    --search-border: #4c3a7a;
     --input-focus: #5a5a58;
   }
 
-  /* Detecta tema do sistema automaticamente */
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
       --bg: #191919;
@@ -77,6 +82,9 @@
       --error-text: #ff8080;
       --success: #6fcf7e;
       --warning: #f5b041;
+      --search: #a78bfa;
+      --search-bg: #2d2244;
+      --search-border: #4c3a7a;
       --input-focus: #5a5a58;
     }
   }
@@ -117,8 +125,7 @@
   header span { font-size: 12px; color: var(--muted); margin-left: 4px; }
   .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--success); margin-left: auto; }
 
-  /* Toggle de tema */
-  .theme-toggle {
+  .header-btn {
     background: none;
     border: 1px solid var(--border);
     color: var(--muted);
@@ -131,11 +138,15 @@
     justify-content: center;
     font-size: 13px;
     transition: all 0.15s ease;
-    margin-left: 8px;
   }
-  .theme-toggle:hover {
+  .header-btn:hover {
     background: var(--surface);
     color: var(--text);
+  }
+  .header-btn.active {
+    background: var(--search-bg);
+    border-color: var(--search-border);
+    color: var(--search);
   }
 
   /* ── API Key banner ── */
@@ -149,9 +160,8 @@
     flex-shrink: 0;
     transition: background 0.2s ease, border-color 0.2s ease;
   }
-  #key-banner.hidden { display: none; }
   #key-banner label { font-size: 12px; color: var(--accent-text); font-weight: 500; white-space: nowrap; }
-  #api-key-input {
+  #key-banner input {
     flex: 1;
     font-size: 12px;
     font-family: var(--font);
@@ -163,8 +173,8 @@
     outline: none;
     transition: all 0.2s ease;
   }
-  #api-key-input:focus { border-color: var(--accent); }
-  #save-key-btn {
+  #key-banner input:focus { border-color: var(--accent); }
+  #key-banner button {
     font-size: 12px;
     padding: 5px 12px;
     background: var(--accent);
@@ -176,17 +186,13 @@
     white-space: nowrap;
     transition: opacity 0.15s;
   }
-  #save-key-btn:hover { opacity: 0.85; }
-  #change-key-btn {
-    font-size: 12px;
-    color: var(--muted);
+  #key-banner button:hover { opacity: 0.85; }
+  #key-banner .change-btn {
     background: none;
-    border: none;
-    cursor: pointer;
+    color: var(--muted);
     margin-left: auto;
-    font-family: var(--font);
   }
-  #change-key-btn:hover { color: var(--text); }
+  #key-banner .change-btn:hover { color: var(--text); opacity: 1; }
 
   /* ── Messages ── */
   #messages {
@@ -227,6 +233,87 @@
     color: var(--text);
     border: 1px solid var(--border);
     border-bottom-left-radius: 2px;
+  }
+
+  /* ── Search indicator ── */
+  .search-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    background: var(--search-bg);
+    border: 1px solid var(--search-border);
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--search);
+    margin-bottom: 6px;
+    max-width: fit-content;
+  }
+  .search-indicator .spinner {
+    width: 10px; height: 10px;
+    border: 2px solid var(--search-border);
+    border-top-color: var(--search);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── Sources ── */
+  .sources {
+    margin-top: 8px;
+    padding: 10px 14px;
+    background: var(--search-bg);
+    border: 1px solid var(--search-border);
+    border-radius: var(--radius);
+    max-width: 82%;
+    font-size: 12px;
+  }
+  .sources-title {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--search);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .sources-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .source-item {
+    display: flex;
+    gap: 6px;
+    align-items: flex-start;
+    line-height: 1.4;
+  }
+  .source-num {
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    background: var(--search);
+    color: white;
+    border-radius: 50%;
+    font-size: 10px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .source-link {
+    color: var(--text);
+    text-decoration: none;
+    flex: 1;
+    word-break: break-word;
+  }
+  .source-link:hover { color: var(--search); text-decoration: underline; }
+  .source-domain {
+    color: var(--muted);
+    font-size: 11px;
   }
 
   /* ── Typing ── */
@@ -327,6 +414,26 @@
     max-width: 82%;
     transition: all 0.2s ease;
   }
+
+  /* ── Tooltip ── */
+  .tooltip { position: relative; }
+  .tooltip::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    background: var(--text);
+    color: var(--bg);
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s;
+    z-index: 10;
+  }
+  .tooltip:hover::after { opacity: 1; }
 </style>
 </head>
 <body>
@@ -343,14 +450,15 @@
   </div>
   <h1>Claude <span>× Notion</span></h1>
   <div class="dot" id="status-dot" title="Pronto"></div>
-  <button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()" title="Alternar tema">🌓</button>
+  <button class="header-btn tooltip" id="search-toggle" onclick="toggleSearch()" data-tooltip="Pesquisa web">🔍</button>
+  <button class="header-btn tooltip" id="theme-toggle" onclick="toggleTheme()" data-tooltip="Alternar tema">🌓</button>
 </header>
 
 <!-- API Key banner -->
 <div id="key-banner">
   <label>🔑 Chave API Anthropic</label>
   <input id="api-key-input" type="password" placeholder="sk-ant-..." />
-  <button id="save-key-btn" onclick="saveKey()">Salvar</button>
+  <button onclick="saveKey()">Salvar</button>
 </div>
 
 <!-- Messages -->
@@ -359,7 +467,9 @@
     <span class="msg-label">Claude</span>
     <div class="bubble">Olá! Sou seu assistente Claude integrado ao Notion. 👋
 
-Posso ajudar com redação, resumos, brainstorming, análises e qualquer tarefa de produtividade diretamente aqui no Notion.
+Posso ajudar com redação, resumos, brainstorming, análises e tarefas de produtividade. 
+
+🔍 <strong>Pesquisa web disponível!</strong> Ative pelo botão no topo para que eu busque informações atualizadas na internet quando necessário.
 
 Para começar, cole sua chave de API Anthropic no campo acima.</div>
   </div>
@@ -371,6 +481,7 @@ Para começar, cole sua chave de API Anthropic no campo acima.</div>
   <span class="chip" onclick="setInput('Crie uma lista de tarefas para o projeto:')">✅ Criar tarefas</span>
   <span class="chip" onclick="setInput('Melhore a redação deste texto:')">✨ Melhorar texto</span>
   <span class="chip" onclick="setInput('Gere ideias criativas sobre:')">💡 Brainstorm</span>
+  <span class="chip" onclick="setInput('Pesquise na web as últimas notícias sobre:')">🌐 Pesquisar</span>
 </div>
 
 <!-- Input -->
@@ -380,32 +491,28 @@ Para começar, cole sua chave de API Anthropic no campo acima.</div>
 </div>
 
 <script>
-  const messagesEl = document.getElementById('messages');
-  const inputEl    = document.getElementById('user-input');
-  const sendBtn    = document.getElementById('send-btn');
-  const keyBanner  = document.getElementById('key-banner');
-  const keyInput   = document.getElementById('api-key-input');
-  const statusDot  = document.getElementById('status-dot');
-  const themeToggle = document.getElementById('theme-toggle');
-  const history    = [];
+  const messagesEl   = document.getElementById('messages');
+  const inputEl      = document.getElementById('user-input');
+  const sendBtn      = document.getElementById('send-btn');
+  const keyBanner    = document.getElementById('key-banner');
+  const statusDot    = document.getElementById('status-dot');
+  const themeToggle  = document.getElementById('theme-toggle');
+  const searchToggle = document.getElementById('search-toggle');
+  const history      = [];
 
   /* ── Sistema de Tema Adaptativo ── */
   function detectNotionTheme() {
-    // 1. Verifica parâmetros da URL (Notion às vezes envia ?theme=dark)
     const urlParams = new URLSearchParams(window.location.search);
     const urlTheme = urlParams.get('theme') || urlParams.get('mode');
     if (urlTheme === 'dark' || urlTheme === 'light') return urlTheme;
 
-    // 2. Verifica preferência salva
     const savedTheme = localStorage.getItem('notion_claude_theme');
     if (savedTheme === 'dark' || savedTheme === 'light') return savedTheme;
 
-    // 3. Usa preferência do sistema (funciona quando embutido no Notion)
     if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
       return 'dark';
     }
 
-    // 4. Tenta detectar via parent window (quando em iframe no Notion)
     try {
       if (window.parent && window.parent !== window) {
         const parentBg = window.getComputedStyle(window.parent.document.body).backgroundColor;
@@ -417,9 +524,7 @@ Para começar, cole sua chave de API Anthropic no campo acima.</div>
           }
         }
       }
-    } catch (e) {
-      // Cross-origin bloqueia o acesso, ignora silenciosamente
-    }
+    } catch (e) {}
 
     return 'light';
   }
@@ -427,7 +532,7 @@ Para começar, cole sua chave de API Anthropic no campo acima.</div>
   function applyTheme(theme) {
     document.documentElement.setAttribute('data-theme', theme);
     themeToggle.textContent = theme === 'dark' ? '☀️' : '🌙';
-    themeToggle.title = theme === 'dark' ? 'Mudar para tema claro' : 'Mudar para tema escuro';
+    themeToggle.setAttribute('data-tooltip', theme === 'dark' ? 'Tema claro' : 'Tema escuro');
   }
 
   function toggleTheme() {
@@ -437,20 +542,16 @@ Para começar, cole sua chave de API Anthropic no campo acima.</div>
     applyTheme(newTheme);
   }
 
-  // Aplica tema inicial
   applyTheme(detectNotionTheme());
 
-  // Escuta mudanças no tema do sistema (Notion reflete isso)
   if (window.matchMedia) {
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-      // Só aplica se o usuário não tiver escolhido manualmente
       if (!localStorage.getItem('notion_claude_theme')) {
         applyTheme(e.matches ? 'dark' : 'light');
       }
     });
   }
 
-  // Escuta mensagens do Notion (quando embutido via iframe)
   window.addEventListener('message', (event) => {
     if (event.data && typeof event.data === 'object') {
       if (event.data.theme === 'dark' || event.data.theme === 'light') {
@@ -461,17 +562,38 @@ Para começar, cole sua chave de API Anthropic no campo acima.</div>
     }
   });
 
+  /* ── Web Search Toggle ── */
+  let webSearchEnabled = localStorage.getItem('web_search_enabled') === 'true';
+
+  function updateSearchToggle() {
+    if (webSearchEnabled) {
+      searchToggle.classList.add('active');
+      searchToggle.setAttribute('data-tooltip', 'Pesquisa web: ATIVADA');
+    } else {
+      searchToggle.classList.remove('active');
+      searchToggle.setAttribute('data-tooltip', 'Pesquisa web: desativada');
+    }
+  }
+
+  function toggleSearch() {
+    webSearchEnabled = !webSearchEnabled;
+    localStorage.setItem('web_search_enabled', webSearchEnabled);
+    updateSearchToggle();
+  }
+
+  updateSearchToggle();
+
   /* ── API Key ── */
   let apiKey = localStorage.getItem('claude_api_key') || '';
 
   function updateKeyBanner() {
     if (apiKey) {
       keyBanner.innerHTML = `<label>🔑 Chave configurada</label>
-        <button id="change-key-btn" onclick="clearKey()">Trocar chave</button>`;
+        <button class="change-btn" onclick="clearKey()">Trocar chave</button>`;
     } else {
       keyBanner.innerHTML = `<label>🔑 Chave API Anthropic</label>
         <input id="api-key-input" type="password" placeholder="sk-ant-..." />
-        <button id="save-key-btn" onclick="saveKey()">Salvar</button>`;
+        <button onclick="saveKey()">Salvar</button>`;
     }
   }
 
@@ -515,26 +637,145 @@ Para começar, cole sua chave de API Anthropic no campo acima.</div>
     wrap.appendChild(bubble);
     messagesEl.appendChild(wrap);
     scrollBottom();
+    return wrap;
   }
 
-  function showTyping() {
+  function addAssistantMessage(text, searchQueries = [], sources = []) {
+    const wrap = document.createElement('div');
+    wrap.className = 'msg assistant';
+    
+    const label = document.createElement('span');
+    label.className = 'msg-label';
+    label.textContent = 'Claude';
+    wrap.appendChild(label);
+
+    // Indicadores de busca realizada
+    if (searchQueries.length > 0) {
+      searchQueries.forEach(query => {
+        const indicator = document.createElement('div');
+        indicator.className = 'search-indicator';
+        indicator.innerHTML = `🔍 <span>Pesquisou: "${query}"</span>`;
+        wrap.appendChild(indicator);
+      });
+    }
+
+    // Bolha com texto
+    const bubble = document.createElement('div');
+    bubble.className = 'bubble';
+    bubble.textContent = text;
+    wrap.appendChild(bubble);
+
+    // Fontes citadas
+    if (sources.length > 0) {
+      const sourcesEl = document.createElement('div');
+      sourcesEl.className = 'sources';
+      
+      const title = document.createElement('div');
+      title.className = 'sources-title';
+      title.innerHTML = '🔗 Fontes consultadas';
+      sourcesEl.appendChild(title);
+
+      const list = document.createElement('div');
+      list.className = 'sources-list';
+
+      sources.forEach((src, i) => {
+        const item = document.createElement('div');
+        item.className = 'source-item';
+        
+        const num = document.createElement('span');
+        num.className = 'source-num';
+        num.textContent = i + 1;
+        
+        const linkWrap = document.createElement('div');
+        linkWrap.style.flex = '1';
+        linkWrap.style.minWidth = '0';
+        
+        const link = document.createElement('a');
+        link.className = 'source-link';
+        link.href = src.url;
+        link.target = '_blank';
+        link.rel = 'noopener noreferrer';
+        link.textContent = src.title || src.url;
+        
+        const domain = document.createElement('div');
+        domain.className = 'source-domain';
+        try {
+          domain.textContent = new URL(src.url).hostname.replace('www.', '');
+        } catch(e) {
+          domain.textContent = '';
+        }
+        
+        linkWrap.appendChild(link);
+        linkWrap.appendChild(domain);
+        item.appendChild(num);
+        item.appendChild(linkWrap);
+        list.appendChild(item);
+      });
+
+      sourcesEl.appendChild(list);
+      wrap.appendChild(sourcesEl);
+    }
+
+    messagesEl.appendChild(wrap);
+    scrollBottom();
+  }
+
+  function showTyping(searching = false) {
     const wrap = document.createElement('div');
     wrap.className = 'msg assistant';
     wrap.id = 'typing';
     const label = document.createElement('span');
-    label.className = 'msg-label'; label.textContent = 'Claude';
+    label.className = 'msg-label'; 
+    label.textContent = 'Claude';
+    wrap.appendChild(label);
+
+    if (searching) {
+      const indicator = document.createElement('div');
+      indicator.className = 'search-indicator';
+      indicator.innerHTML = '<div class="spinner"></div><span>Pesquisando na web...</span>';
+      wrap.appendChild(indicator);
+    }
+
     const bubble = document.createElement('div');
     bubble.className = 'typing-bubble';
     bubble.innerHTML = '<div class="dot-anim"></div><div class="dot-anim"></div><div class="dot-anim"></div>';
-    wrap.appendChild(label); wrap.appendChild(bubble);
-    messagesEl.appendChild(wrap); scrollBottom();
+    wrap.appendChild(bubble);
+    messagesEl.appendChild(wrap); 
+    scrollBottom();
+  }
+
+  function updateTypingToSearch() {
+    const typing = document.getElementById('typing');
+    if (!typing) return;
+    // Remove indicador antigo se existir
+    const oldIndicator = typing.querySelector('.search-indicator');
+    if (oldIndicator) oldIndicator.remove();
+    
+    const indicator = document.createElement('div');
+    indicator.className = 'search-indicator';
+    indicator.innerHTML = '<div class="spinner"></div><span>Pesquisando na web...</span>';
+    
+    const bubble = typing.querySelector('.typing-bubble');
+    typing.insertBefore(indicator, bubble);
+    scrollBottom();
   }
 
   function removeTyping() { const el = document.getElementById('typing'); if (el) el.remove(); }
 
-  function setStatus(active) {
-    statusDot.style.background = active ? 'var(--warning)' : 'var(--success)';
-    statusDot.title = active ? 'Processando…' : 'Pronto';
+  function setStatus(state) {
+    // state: 'idle' | 'processing' | 'searching'
+    const colors = {
+      idle: 'var(--success)',
+      processing: 'var(--warning)',
+      searching: 'var(--search)'
+    };
+    const titles = {
+      idle: 'Pronto',
+      processing: 'Processando…',
+      searching: 'Pesquisando na web…'
+    };
+    statusDot.style.background = colors[state];
+    statusDot.title = titles[state];
   }
 
   /* ── Send ── */
@@ -550,11 +791,28 @@ Para começar, cole sua chave de API Anthropic no campo acima.</div>
     inputEl.value = '';
     autoResize();
     sendBtn.disabled = true;
-    setStatus(true);
+    setStatus('processing');
 
     addMsg('user', text);
     history.push({ role: 'user', content: text });
     showTyping();
+
+    // Monta o body da requisição
+    const requestBody = {
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 2000,
+      system: `Você é um assistente produtivo integrado ao Notion. Ajude com redação, resumos, listas, brainstorming, análises e tarefas de produtividade. Seja claro e objetivo. Responda sempre em português brasileiro. Use formatação simples e legível.${webSearchEnabled ? ' Quando o usuário pedir informações atuais, notícias, dados recentes ou algo que exija verificação, use a ferramenta de pesquisa web. Sempre cite suas fontes.' : ''}`,
+      messages: history
+    };
+
+    // Adiciona a ferramenta de web search se ativada
+    if (webSearchEnabled) {
+      requestBody.tools = [{
+        type: "web_search_20250305",
+        name: "web_search",
+        max_uses: 5
+      }];
+    }
 
     try {
       const res = await fetch('https://api.anthropic.com/v1/messages', {
@@ -565,12 +823,7 @@ Para começar, cole sua chave de API Anthropic no campo acima.</div>
           'anthropic-version': '2023-06-01',
           'anthropic-dangerous-direct-browser-access': 'true'
         },
-        body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514',
-          max_tokens: 1000,
-          system: `Você é um assistente produtivo integrado ao Notion. Ajude com redação, resumos, listas, brainstorming, análises e tarefas de produtividade. Seja claro e objetivo. Responda sempre em português brasileiro. Use formatação simples e legível.`,
-          messages: history
-        })
+        body: JSON.stringify(requestBody)
       });
 
       const data = await res.json();
@@ -580,18 +833,59 @@ Para começar, cole sua chave de API Anthropic no campo acima.</div>
         const errMsg = data?.error?.message || `Erro ${res.status}`;
         addMsg('assistant', '⚠️ ' + errMsg, true);
       } else {
-        const reply = (data.content || []).filter(b => b.type === 'text').map(b => b.text).join('\n').trim()
-          || 'Sem resposta.';
-        addMsg('assistant', reply);
+        // Processa blocos de resposta
+        const blocks = data.content || [];
+        const textParts = [];
+        const searchQueries = [];
+        const sourcesMap = new Map(); // Evita URLs duplicadas
+
+        blocks.forEach(block => {
+          if (block.type === 'text') {
+            textParts.push(block.text);
+            // Extrai citações se houver
+            if (block.citations && Array.isArray(block.citations)) {
+              block.citations.forEach(cit => {
+                if (cit.url && !sourcesMap.has(cit.url)) {
+                  sourcesMap.set(cit.url, {
+                    url: cit.url,
+                    title: cit.title || cit.url
+                  });
+                }
+              });
+            }
+          } else if (block.type === 'server_tool_use' && block.name === 'web_search') {
+            if (block.input && block.input.query) {
+              searchQueries.push(block.input.query);
+            }
+          } else if (block.type === 'web_search_tool_result') {
+            const results = block.content || [];
+            if (Array.isArray(results)) {
+              results.forEach(r => {
+                if (r.url && !sourcesMap.has(r.url)) {
+                  sourcesMap.set(r.url, {
+                    url: r.url,
+                    title: r.title || r.url
+                  });
+                }
+              });
+            }
+          }
+        });
+
+        const reply = textParts.join('\n').trim() || 'Sem resposta.';
+        const sources = Array.from(sourcesMap.values());
+
+        addAssistantMessage(reply, searchQueries, sources);
         history.push({ role: 'assistant', content: reply });
       }
     } catch (err) {
       removeTyping();
       addMsg('assistant', '⚠️ Falha de conexão. Verifique sua internet e tente novamente.', true);
+      console.error(err);
     }
 
     sendBtn.disabled = false;
-    setStatus(false);
+    setStatus('idle');
     inputEl.focus();
   }
 
