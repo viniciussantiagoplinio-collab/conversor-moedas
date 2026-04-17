@@ -32,6 +32,7 @@
     --search-bg: #f3efff;
     --search-border: #d9ccff;
     --input-focus: #b0b0a8;
+    --sidebar-bg: #fbfaf8;
     --radius: 6px;
     --font: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   }
@@ -60,6 +61,7 @@
     --search-bg: #2d2244;
     --search-border: #4c3a7a;
     --input-focus: #5a5a58;
+    --sidebar-bg: #202020;
   }
 
   @media (prefers-color-scheme: dark) {
@@ -86,6 +88,7 @@
       --search-bg: #2d2244;
       --search-border: #4c3a7a;
       --input-focus: #5a5a58;
+      --sidebar-bg: #202020;
     }
   }
 
@@ -95,10 +98,126 @@
     color: var(--text);
     font-size: 14px;
     height: 100vh;
-    display: flex;
-    flex-direction: column;
     overflow: hidden;
     transition: background 0.2s ease, color 0.2s ease;
+  }
+
+  /* ── Layout principal ── */
+  .app {
+    display: flex;
+    height: 100vh;
+  }
+
+  /* ── Sidebar ── */
+  .sidebar {
+    width: 260px;
+    background: var(--sidebar-bg);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    transition: width 0.25s ease, background 0.2s ease, border-color 0.2s ease;
+    overflow: hidden;
+  }
+  .sidebar.collapsed { width: 0; border-right: none; }
+
+  .sidebar-header {
+    padding: 12px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .new-chat-btn {
+    width: 100%;
+    padding: 8px 12px;
+    background: var(--text);
+    color: var(--text-inverse);
+    border: none;
+    border-radius: var(--radius);
+    font-family: var(--font);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: opacity 0.15s;
+  }
+  .new-chat-btn:hover { opacity: 0.85; }
+
+  .conversations-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .conversations-list::-webkit-scrollbar { width: 4px; }
+  .conversations-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+  .conv-empty {
+    text-align: center;
+    color: var(--muted);
+    font-size: 12px;
+    padding: 24px 12px;
+    line-height: 1.5;
+  }
+
+  .conv-item {
+    padding: 8px 10px;
+    border-radius: var(--radius);
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: background 0.1s;
+    position: relative;
+    min-width: 0;
+  }
+  .conv-item:hover { background: var(--surface-hover); }
+  .conv-item.active { background: var(--surface); font-weight: 500; }
+
+  .conv-title {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 0;
+  }
+  .conv-delete {
+    opacity: 0;
+    background: none;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-size: 12px;
+    transition: all 0.15s;
+    flex-shrink: 0;
+  }
+  .conv-item:hover .conv-delete { opacity: 0.7; }
+  .conv-delete:hover { opacity: 1 !important; color: var(--error-text); background: var(--error-bg); }
+
+  .sidebar-footer {
+    padding: 8px 12px;
+    border-top: 1px solid var(--border);
+    font-size: 11px;
+    color: var(--muted);
+    text-align: center;
+    flex-shrink: 0;
+  }
+
+  /* ── Main content ── */
+  .main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    overflow: hidden;
   }
 
   /* ── Header ── */
@@ -122,7 +241,7 @@
   }
   .logo svg { fill: var(--bg); width: 14px; height: 14px; transition: fill 0.2s ease; }
   header h1 { font-size: 14px; font-weight: 600; color: var(--text); }
-  header span { font-size: 12px; color: var(--muted); margin-left: 4px; }
+  header span.subtitle { font-size: 12px; color: var(--muted); margin-left: 4px; }
   .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--success); margin-left: auto; }
 
   .header-btn {
@@ -276,33 +395,18 @@
     text-transform: uppercase;
     letter-spacing: 0.05em;
     margin-bottom: 6px;
-    display: flex;
-    align-items: center;
-    gap: 4px;
   }
-  .sources-list {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-  }
-  .source-item {
-    display: flex;
-    gap: 6px;
-    align-items: flex-start;
-    line-height: 1.4;
-  }
+  .sources-list { display: flex; flex-direction: column; gap: 4px; }
+  .source-item { display: flex; gap: 6px; align-items: flex-start; line-height: 1.4; }
   .source-num {
     flex-shrink: 0;
-    width: 18px;
-    height: 18px;
+    width: 18px; height: 18px;
     background: var(--search);
     color: white;
     border-radius: 50%;
     font-size: 10px;
     font-weight: 600;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: flex; align-items: center; justify-content: center;
   }
   .source-link {
     color: var(--text);
@@ -311,10 +415,7 @@
     word-break: break-word;
   }
   .source-link:hover { color: var(--search); text-decoration: underline; }
-  .source-domain {
-    color: var(--muted);
-    font-size: 11px;
-  }
+  .source-domain { color: var(--muted); font-size: 11px; }
 
   /* ── Typing ── */
   .typing-bubble {
@@ -324,7 +425,6 @@
     border: 1px solid var(--border);
     border-radius: var(--radius);
     border-bottom-left-radius: 2px;
-    transition: background 0.2s ease, border-color 0.2s ease;
   }
   .dot-anim {
     width: 5px; height: 5px;
@@ -366,7 +466,6 @@
     align-items: flex-end;
     flex-shrink: 0;
     background: var(--bg);
-    transition: background 0.2s ease, border-color 0.2s ease;
   }
   #user-input {
     flex: 1;
@@ -412,7 +511,6 @@
     border-radius: var(--radius);
     font-size: 13px;
     max-width: 82%;
-    transition: all 0.2s ease;
   }
 
   /* ── Tooltip ── */
@@ -434,80 +532,146 @@
     z-index: 10;
   }
   .tooltip:hover::after { opacity: 1; }
+
+  /* ── Modal confirmação ── */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+  }
+  .modal-overlay.show { display: flex; }
+  .modal {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    max-width: 360px;
+    width: 90%;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+  }
+  .modal h3 { font-size: 15px; font-weight: 600; margin-bottom: 8px; }
+  .modal p { font-size: 13px; color: var(--muted); margin-bottom: 16px; line-height: 1.5; }
+  .modal-actions { display: flex; gap: 8px; justify-content: flex-end; }
+  .modal-btn {
+    padding: 6px 14px;
+    font-size: 13px;
+    font-family: var(--font);
+    border-radius: var(--radius);
+    cursor: pointer;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text);
+    transition: all 0.15s;
+  }
+  .modal-btn:hover { background: var(--surface); }
+  .modal-btn.danger {
+    background: var(--error-text);
+    color: white;
+    border-color: var(--error-text);
+  }
+  .modal-btn.danger:hover { opacity: 0.85; background: var(--error-text); }
+
+  /* ── Responsivo ── */
+  @media (max-width: 640px) {
+    .sidebar { position: absolute; height: 100%; z-index: 50; box-shadow: 2px 0 8px rgba(0,0,0,0.1); }
+    .sidebar.collapsed { width: 0; }
+    .sidebar:not(.collapsed) { width: 240px; }
+  }
 </style>
 </head>
 <body>
 
-<header>
-  <div class="logo">
-    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-      <path d="M6 7.5C6 4.46 8.46 2 11.5 2H70l28 28v62.5c0 3.04-2.46 5.5-5.5 5.5H11.5C8.46 98 6 95.54 6 92.5V7.5z"/>
-      <path fill-rule="evenodd" d="M70 2l28 28H70V2z" fill="rgba(255,255,255,0.25)"/>
-      <rect x="22" y="44" width="56" height="5" rx="2" fill="rgba(255,255,255,0.85)"/>
-      <rect x="22" y="57" width="40" height="5" rx="2" fill="rgba(255,255,255,0.6)"/>
-      <rect x="22" y="70" width="48" height="5" rx="2" fill="rgba(255,255,255,0.6)"/>
-    </svg>
+<div class="app">
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <button class="new-chat-btn" onclick="newConversation()">
+        <span>＋</span> Nova conversa
+      </button>
+    </div>
+    <div class="conversations-list" id="conv-list"></div>
+    <div class="sidebar-footer" id="storage-info">—</div>
+  </aside>
+
+  <!-- Main -->
+  <div class="main">
+    <header>
+      <button class="header-btn tooltip" onclick="toggleSidebar()" data-tooltip="Conversas">☰</button>
+      <div class="logo">
+        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <path d="M6 7.5C6 4.46 8.46 2 11.5 2H70l28 28v62.5c0 3.04-2.46 5.5-5.5 5.5H11.5C8.46 98 6 95.54 6 92.5V7.5z"/>
+          <path fill-rule="evenodd" d="M70 2l28 28H70V2z" fill="rgba(255,255,255,0.25)"/>
+          <rect x="22" y="44" width="56" height="5" rx="2" fill="rgba(255,255,255,0.85)"/>
+          <rect x="22" y="57" width="40" height="5" rx="2" fill="rgba(255,255,255,0.6)"/>
+          <rect x="22" y="70" width="48" height="5" rx="2" fill="rgba(255,255,255,0.6)"/>
+        </svg>
+      </div>
+      <h1>Claude <span class="subtitle">× Notion</span></h1>
+      <div class="dot" id="status-dot" title="Pronto"></div>
+      <button class="header-btn tooltip" id="search-toggle" onclick="toggleSearch()" data-tooltip="Pesquisa web">🔍</button>
+    </header>
+
+    <!-- API Key banner -->
+    <div id="key-banner">
+      <label>🔑 Chave API Anthropic</label>
+      <input id="api-key-input" type="password" placeholder="sk-ant-..." />
+      <button onclick="saveKey()">Salvar</button>
+    </div>
+
+    <!-- Messages -->
+    <div id="messages"></div>
+
+    <!-- Quick chips -->
+    <div id="chips">
+      <span class="chip" onclick="setInput('Resuma este texto em 3 tópicos:')">📝 Resumir</span>
+      <span class="chip" onclick="setInput('Crie uma lista de tarefas para o projeto:')">✅ Criar tarefas</span>
+      <span class="chip" onclick="setInput('Melhore a redação deste texto:')">✨ Melhorar texto</span>
+      <span class="chip" onclick="setInput('Gere ideias criativas sobre:')">💡 Brainstorm</span>
+      <span class="chip" onclick="setInput('Pesquise na web as últimas notícias sobre:')">🌐 Pesquisar</span>
+    </div>
+
+    <!-- Input -->
+    <div id="input-area">
+      <textarea id="user-input" placeholder="Escreva sua mensagem… (Enter para enviar)" rows="1"></textarea>
+      <button id="send-btn" onclick="sendMessage()">Enviar</button>
+    </div>
   </div>
-  <h1>Claude <span>× Notion</span></h1>
-  <div class="dot" id="status-dot" title="Pronto"></div>
-  <button class="header-btn tooltip" id="search-toggle" onclick="toggleSearch()" data-tooltip="Pesquisa web">🔍</button>
-  <button class="header-btn tooltip" id="theme-toggle" onclick="toggleTheme()" data-tooltip="Alternar tema">🌓</button>
-</header>
-
-<!-- API Key banner -->
-<div id="key-banner">
-  <label>🔑 Chave API Anthropic</label>
-  <input id="api-key-input" type="password" placeholder="sk-ant-..." />
-  <button onclick="saveKey()">Salvar</button>
 </div>
 
-<!-- Messages -->
-<div id="messages">
-  <div class="msg assistant">
-    <span class="msg-label">Claude</span>
-    <div class="bubble">Olá! Sou seu assistente Claude integrado ao Notion. 👋
-
-Posso ajudar com redação, resumos, brainstorming, análises e tarefas de produtividade. 
-
-🔍 <strong>Pesquisa web disponível!</strong> Ative pelo botão no topo para que eu busque informações atualizadas na internet quando necessário.
-
-Para começar, cole sua chave de API Anthropic no campo acima.</div>
+<!-- Modal de confirmação -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <h3 id="modal-title">Confirmar</h3>
+    <p id="modal-text">Tem certeza?</p>
+    <div class="modal-actions">
+      <button class="modal-btn" onclick="closeModal()">Cancelar</button>
+      <button class="modal-btn danger" id="modal-confirm">Excluir</button>
+    </div>
   </div>
-</div>
-
-<!-- Quick chips -->
-<div id="chips">
-  <span class="chip" onclick="setInput('Resuma este texto em 3 tópicos:')">📝 Resumir</span>
-  <span class="chip" onclick="setInput('Crie uma lista de tarefas para o projeto:')">✅ Criar tarefas</span>
-  <span class="chip" onclick="setInput('Melhore a redação deste texto:')">✨ Melhorar texto</span>
-  <span class="chip" onclick="setInput('Gere ideias criativas sobre:')">💡 Brainstorm</span>
-  <span class="chip" onclick="setInput('Pesquise na web as últimas notícias sobre:')">🌐 Pesquisar</span>
-</div>
-
-<!-- Input -->
-<div id="input-area">
-  <textarea id="user-input" placeholder="Escreva sua mensagem… (Enter para enviar)" rows="1"></textarea>
-  <button id="send-btn" onclick="sendMessage()">Enviar</button>
 </div>
 
 <script>
+  /* ── Refs ── */
   const messagesEl   = document.getElementById('messages');
   const inputEl      = document.getElementById('user-input');
   const sendBtn      = document.getElementById('send-btn');
   const keyBanner    = document.getElementById('key-banner');
   const statusDot    = document.getElementById('status-dot');
-  const themeToggle  = document.getElementById('theme-toggle');
   const searchToggle = document.getElementById('search-toggle');
-  const history      = [];
+  const sidebar      = document.getElementById('sidebar');
+  const convList     = document.getElementById('conv-list');
+  const storageInfo  = document.getElementById('storage-info');
+  const modal        = document.getElementById('modal');
 
-  /* ── Sistema de Tema Adaptativo ── */
+  /* ── Tema (auto apenas) ── */
   function detectNotionTheme() {
     const urlParams = new URLSearchParams(window.location.search);
     const urlTheme = urlParams.get('theme') || urlParams.get('mode');
     if (urlTheme === 'dark' || urlTheme === 'light') return urlTheme;
-
-    const savedTheme = localStorage.getItem('notion_claude_theme');
-    if (savedTheme === 'dark' || savedTheme === 'light') return savedTheme;
 
     if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
       return 'dark';
@@ -531,116 +695,200 @@ Para começar, cole sua chave de API Anthropic no campo acima.</div>
 
   function applyTheme(theme) {
     document.documentElement.setAttribute('data-theme', theme);
-    themeToggle.textContent = theme === 'dark' ? '☀️' : '🌙';
-    themeToggle.setAttribute('data-tooltip', theme === 'dark' ? 'Tema claro' : 'Tema escuro');
-  }
-
-  function toggleTheme() {
-    const current = document.documentElement.getAttribute('data-theme') || detectNotionTheme();
-    const newTheme = current === 'dark' ? 'light' : 'dark';
-    localStorage.setItem('notion_claude_theme', newTheme);
-    applyTheme(newTheme);
   }
 
   applyTheme(detectNotionTheme());
 
   if (window.matchMedia) {
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-      if (!localStorage.getItem('notion_claude_theme')) {
-        applyTheme(e.matches ? 'dark' : 'light');
-      }
+      applyTheme(e.matches ? 'dark' : 'light');
     });
   }
 
   window.addEventListener('message', (event) => {
     if (event.data && typeof event.data === 'object') {
       if (event.data.theme === 'dark' || event.data.theme === 'light') {
-        if (!localStorage.getItem('notion_claude_theme')) {
-          applyTheme(event.data.theme);
-        }
+        applyTheme(event.data.theme);
       }
     }
   });
 
-  /* ── Web Search Toggle ── */
-  let webSearchEnabled = localStorage.getItem('web_search_enabled') === 'true';
+  /* ── Sistema de Conversas ── */
+  const STORAGE_KEY = 'claude_conversations';
+  const CURRENT_KEY = 'claude_current_conversation';
 
-  function updateSearchToggle() {
-    if (webSearchEnabled) {
-      searchToggle.classList.add('active');
-      searchToggle.setAttribute('data-tooltip', 'Pesquisa web: ATIVADA');
-    } else {
-      searchToggle.classList.remove('active');
-      searchToggle.setAttribute('data-tooltip', 'Pesquisa web: desativada');
+  let conversations = loadConversations();
+  let currentId = localStorage.getItem(CURRENT_KEY);
+
+  function loadConversations() {
+    try {
+      const data = localStorage.getItem(STORAGE_KEY);
+      return data ? JSON.parse(data) : [];
+    } catch (e) {
+      console.error('Erro ao carregar conversas:', e);
+      return [];
     }
   }
 
-  function toggleSearch() {
-    webSearchEnabled = !webSearchEnabled;
-    localStorage.setItem('web_search_enabled', webSearchEnabled);
-    updateSearchToggle();
-  }
-
-  updateSearchToggle();
-
-  /* ── API Key ── */
-  let apiKey = localStorage.getItem('claude_api_key') || '';
-
-  function updateKeyBanner() {
-    if (apiKey) {
-      keyBanner.innerHTML = `<label>🔑 Chave configurada</label>
-        <button class="change-btn" onclick="clearKey()">Trocar chave</button>`;
-    } else {
-      keyBanner.innerHTML = `<label>🔑 Chave API Anthropic</label>
-        <input id="api-key-input" type="password" placeholder="sk-ant-..." />
-        <button onclick="saveKey()">Salvar</button>`;
+  function saveConversations() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(conversations));
+      updateStorageInfo();
+    } catch (e) {
+      alert('Erro ao salvar: armazenamento cheio. Exclua conversas antigas.');
     }
   }
 
-  function saveKey() {
-    const input = document.getElementById('api-key-input');
-    const val = input.value.trim();
-    if (!val.startsWith('sk-')) { alert('Chave inválida. Deve começar com sk-ant-...'); return; }
-    apiKey = val;
-    localStorage.setItem('claude_api_key', apiKey);
-    updateKeyBanner();
+  function updateStorageInfo() {
+    const total = conversations.length;
+    const totalMsgs = conversations.reduce((s, c) => s + c.messages.length, 0);
+    storageInfo.textContent = total === 0 
+      ? 'Sem conversas' 
+      : `${total} conversa${total > 1 ? 's' : ''} · ${totalMsgs} msg${totalMsgs > 1 ? 's' : ''}`;
   }
 
-  function clearKey() {
-    apiKey = '';
-    localStorage.removeItem('claude_api_key');
-    updateKeyBanner();
+  function generateTitle(firstMessage) {
+    const cleaned = firstMessage.trim().replace(/\n+/g, ' ');
+    return cleaned.length > 40 ? cleaned.substring(0, 40) + '…' : cleaned;
   }
 
-  updateKeyBanner();
-
-  /* ── UI helpers ── */
-  function setInput(text) { inputEl.value = text; inputEl.focus(); autoResize(); }
-
-  function autoResize() {
-    inputEl.style.height = 'auto';
-    inputEl.style.height = Math.min(inputEl.scrollHeight, 120) + 'px';
+  function getCurrentConv() {
+    return conversations.find(c => c.id === currentId);
   }
 
-  function scrollBottom() { messagesEl.scrollTop = messagesEl.scrollHeight; }
+  function newConversation() {
+    const conv = {
+      id: Date.now().toString(36) + Math.random().toString(36).substr(2, 5),
+      title: 'Nova conversa',
+      messages: [],
+      createdAt: Date.now(),
+      updatedAt: Date.now()
+    };
+    conversations.unshift(conv);
+    currentId = conv.id;
+    localStorage.setItem(CURRENT_KEY, currentId);
+    saveConversations();
+    renderConversationsList();
+    renderMessages();
+  }
 
-  function addMsg(role, text, isError = false) {
+  function switchConversation(id) {
+    currentId = id;
+    localStorage.setItem(CURRENT_KEY, currentId);
+    renderConversationsList();
+    renderMessages();
+  }
+
+  function deleteConversation(id) {
+    const conv = conversations.find(c => c.id === id);
+    if (!conv) return;
+    openModal('Excluir conversa', `Deseja excluir "${conv.title}"? Esta ação não pode ser desfeita.`, () => {
+      conversations = conversations.filter(c => c.id !== id);
+      if (currentId === id) {
+        currentId = conversations[0]?.id || null;
+        localStorage.setItem(CURRENT_KEY, currentId || '');
+      }
+      saveConversations();
+      renderConversationsList();
+      renderMessages();
+    });
+  }
+
+  function renderConversationsList() {
+    convList.innerHTML = '';
+    if (conversations.length === 0) {
+      convList.innerHTML = '<div class="conv-empty">Nenhuma conversa salva.<br>Clique em "+ Nova conversa" para começar.</div>';
+      updateStorageInfo();
+      return;
+    }
+
+    // Ordena por mais recente
+    const sorted = [...conversations].sort((a, b) => b.updatedAt - a.updatedAt);
+    
+    sorted.forEach(conv => {
+      const item = document.createElement('div');
+      item.className = 'conv-item' + (conv.id === currentId ? ' active' : '');
+      item.onclick = (e) => {
+        if (e.target.closest('.conv-delete')) return;
+        switchConversation(conv.id);
+      };
+
+      const icon = document.createElement('span');
+      icon.textContent = '💬';
+      icon.style.fontSize = '12px';
+      icon.style.flexShrink = '0';
+
+      const title = document.createElement('span');
+      title.className = 'conv-title';
+      title.textContent = conv.title;
+
+      const del = document.createElement('button');
+      del.className = 'conv-delete';
+      del.innerHTML = '🗑️';
+      del.title = 'Excluir';
+      del.onclick = (e) => {
+        e.stopPropagation();
+        deleteConversation(conv.id);
+      };
+
+      item.appendChild(icon);
+      item.appendChild(title);
+      item.appendChild(del);
+      convList.appendChild(item);
+    });
+
+    updateStorageInfo();
+  }
+
+  function renderMessages() {
+    messagesEl.innerHTML = '';
+    const conv = getCurrentConv();
+
+    if (!conv || conv.messages.length === 0) {
+      const welcome = document.createElement('div');
+      welcome.className = 'msg assistant';
+      welcome.innerHTML = `
+        <span class="msg-label">Claude</span>
+        <div class="bubble">Olá! Sou seu assistente Claude integrado ao Notion. 👋
+
+Posso ajudar com redação, resumos, brainstorming, análises e tarefas de produtividade.
+
+🔍 <strong>Pesquisa web disponível!</strong> Ative pelo botão no topo para buscar informações atualizadas.
+
+💾 <strong>Suas conversas são salvas automaticamente</strong> no navegador.
+
+${apiKey ? 'Pode começar a digitar sua pergunta!' : 'Para começar, cole sua chave de API Anthropic no campo acima.'}</div>
+      `;
+      messagesEl.appendChild(welcome);
+      return;
+    }
+
+    conv.messages.forEach(msg => {
+      if (msg.role === 'user') {
+        renderUserMessage(msg.content);
+      } else {
+        renderAssistantMessage(msg.content, msg.searchQueries || [], msg.sources || []);
+      }
+    });
+
+    scrollBottom();
+  }
+
+  function renderUserMessage(text) {
     const wrap = document.createElement('div');
-    wrap.className = `msg ${role}`;
+    wrap.className = 'msg user';
     const label = document.createElement('span');
     label.className = 'msg-label';
-    label.textContent = role === 'user' ? 'Você' : 'Claude';
+    label.textContent = 'Você';
     const bubble = document.createElement('div');
-    bubble.className = isError ? 'error-bubble' : 'bubble';
+    bubble.className = 'bubble';
     bubble.textContent = text;
     wrap.appendChild(label);
     wrap.appendChild(bubble);
     messagesEl.appendChild(wrap);
-    scrollBottom();
-    return wrap;
   }
 
-  function addAssistantMessage(text, searchQueries = [], sources = []) {
+  function renderAssistantMessage(text, searchQueries = [], sources = [], isError = false) {
     const wrap = document.createElement('div');
     wrap.className = 'msg assistant';
     
@@ -649,7 +897,6 @@ Para começar, cole sua chave de API Anthropic no campo acima.</div>
     label.textContent = 'Claude';
     wrap.appendChild(label);
 
-    // Indicadores de busca realizada
     if (searchQueries.length > 0) {
       searchQueries.forEach(query => {
         const indicator = document.createElement('div');
@@ -659,20 +906,18 @@ Para começar, cole sua chave de API Anthropic no campo acima.</div>
       });
     }
 
-    // Bolha com texto
     const bubble = document.createElement('div');
-    bubble.className = 'bubble';
+    bubble.className = isError ? 'error-bubble' : 'bubble';
     bubble.textContent = text;
     wrap.appendChild(bubble);
 
-    // Fontes citadas
     if (sources.length > 0) {
       const sourcesEl = document.createElement('div');
       sourcesEl.className = 'sources';
       
       const title = document.createElement('div');
       title.className = 'sources-title';
-      title.innerHTML = '🔗 Fontes consultadas';
+      title.textContent = '🔗 FONTES CONSULTADAS';
       sourcesEl.appendChild(title);
 
       const list = document.createElement('div');
@@ -717,10 +962,100 @@ Para começar, cole sua chave de API Anthropic no campo acima.</div>
     }
 
     messagesEl.appendChild(wrap);
-    scrollBottom();
   }
 
-  function showTyping(searching = false) {
+  /* ── Sidebar ── */
+  function toggleSidebar() {
+    sidebar.classList.toggle('collapsed');
+    localStorage.setItem('sidebar_collapsed', sidebar.classList.contains('collapsed'));
+  }
+
+  if (localStorage.getItem('sidebar_collapsed') === 'true') {
+    sidebar.classList.add('collapsed');
+  }
+
+  /* ── Modal ── */
+  let modalCallback = null;
+  function openModal(title, text, onConfirm) {
+    document.getElementById('modal-title').textContent = title;
+    document.getElementById('modal-text').textContent = text;
+    modalCallback = onConfirm;
+    modal.classList.add('show');
+  }
+  function closeModal() {
+    modal.classList.remove('show');
+    modalCallback = null;
+  }
+  document.getElementById('modal-confirm').onclick = () => {
+    if (modalCallback) modalCallback();
+    closeModal();
+  };
+  modal.onclick = (e) => { if (e.target === modal) closeModal(); };
+
+  /* ── Web Search Toggle ── */
+  let webSearchEnabled = localStorage.getItem('web_search_enabled') === 'true';
+
+  function updateSearchToggle() {
+    if (webSearchEnabled) {
+      searchToggle.classList.add('active');
+      searchToggle.setAttribute('data-tooltip', 'Pesquisa web: ATIVADA');
+    } else {
+      searchToggle.classList.remove('active');
+      searchToggle.setAttribute('data-tooltip', 'Pesquisa web: desativada');
+    }
+  }
+
+  function toggleSearch() {
+    webSearchEnabled = !webSearchEnabled;
+    localStorage.setItem('web_search_enabled', webSearchEnabled);
+    updateSearchToggle();
+  }
+
+  updateSearchToggle();
+
+  /* ── API Key ── */
+  let apiKey = localStorage.getItem('claude_api_key') || '';
+
+  function updateKeyBanner() {
+    if (apiKey) {
+      keyBanner.innerHTML = `<label>🔑 Chave configurada</label>
+        <button class="change-btn" onclick="clearKey()">Trocar chave</button>`;
+    } else {
+      keyBanner.innerHTML = `<label>🔑 Chave API Anthropic</label>
+        <input id="api-key-input" type="password" placeholder="sk-ant-..." />
+        <button onclick="saveKey()">Salvar</button>`;
+    }
+  }
+
+  function saveKey() {
+    const input = document.getElementById('api-key-input');
+    const val = input.value.trim();
+    if (!val.startsWith('sk-')) { alert('Chave inválida. Deve começar com sk-ant-...'); return; }
+    apiKey = val;
+    localStorage.setItem('claude_api_key', apiKey);
+    updateKeyBanner();
+    renderMessages(); // atualiza mensagem de boas-vindas
+  }
+
+  function clearKey() {
+    apiKey = '';
+    localStorage.removeItem('claude_api_key');
+    updateKeyBanner();
+  }
+
+  updateKeyBanner();
+
+  /* ── UI helpers ── */
+  function setInput(text) { inputEl.value = text; inputEl.focus(); autoResize(); }
+
+  function autoResize() {
+    inputEl.style.height = 'auto';
+    inputEl.style.height = Math.min(inputEl.scrollHeight, 120) + 'px';
+  }
+
+  function scrollBottom() { messagesEl.scrollTop = messagesEl.scrollHeight; }
+
+  function showTyping() {
     const wrap = document.createElement('div');
     wrap.className = 'msg assistant';
     wrap.id = 'typing';
@@ -728,13 +1063,6 @@ Para começar, cole sua chave de API Anthropic no campo acima.</div>
     label.className = 'msg-label'; 
     label.textContent = 'Claude';
     wrap.appendChild(label);
-
-    if (searching) {
-      const indicator = document.createElement('div');
-      indicator.className = 'search-indicator';
-      indicator.innerHTML = '<div class="spinner"></div><span>Pesquisando na web...</span>';
-      wrap.appendChild(indicator);
-    }
 
     const bubble = document.createElement('div');
     bubble.className = 'typing-bubble';
@@ -744,26 +1072,9 @@ Para começar, cole sua chave de API Anthropic no campo acima.</div>
     scrollBottom();
   }
 
-  function updateTypingToSearch() {
-    const typing = document.getElementById('typing');
-    if (!typing) return;
-    // Remove indicador antigo se existir
-    const oldIndicator = typing.querySelector('.search-indicator');
-    if (oldIndicator) oldIndicator.remove();
-    
-    const indicator = document.createElement('div');
-    indicator.className = 'search-indicator';
-    indicator.innerHTML = '<div class="spinner"></div><span>Pesquisando na web...</span>';
-    
-    const bubble = typing.querySelector('.typing-bubble');
-    typing.insertBefore(indicator, bubble);
-    scrollBottom();
-  }
-
   function removeTyping() { const el = document.getElementById('typing'); if (el) el.remove(); }
 
   function setStatus(state) {
-    // state: 'idle' | 'processing' | 'searching'
     const colors = {
       idle: 'var(--success)',
       processing: 'var(--warning)',
@@ -788,24 +1099,42 @@ Para começar, cole sua chave de API Anthropic no campo acima.</div>
       return;
     }
 
+    // Cria nova conversa se não houver atual
+    if (!getCurrentConv()) {
+      newConversation();
+    }
+
+    const conv = getCurrentConv();
+
     inputEl.value = '';
     autoResize();
     sendBtn.disabled = true;
     setStatus('processing');
 
-    addMsg('user', text);
-    history.push({ role: 'user', content: text });
+    // Adiciona mensagem do usuário
+    conv.messages.push({ role: 'user', content: text });
+    conv.updatedAt = Date.now();
+
+    // Define título baseado na primeira mensagem
+    if (conv.messages.length === 1) {
+      conv.title = generateTitle(text);
+    }
+
+    saveConversations();
+    renderMessages();
+    renderConversationsList();
     showTyping();
 
-    // Monta o body da requisição
+    // Histórico limpo (sem metadata) para enviar à API
+    const apiHistory = conv.messages.map(m => ({ role: m.role, content: m.content }));
+
     const requestBody = {
       model: 'claude-sonnet-4-20250514',
       max_tokens: 2000,
       system: `Você é um assistente produtivo integrado ao Notion. Ajude com redação, resumos, listas, brainstorming, análises e tarefas de produtividade. Seja claro e objetivo. Responda sempre em português brasileiro. Use formatação simples e legível.${webSearchEnabled ? ' Quando o usuário pedir informações atuais, notícias, dados recentes ou algo que exija verificação, use a ferramenta de pesquisa web. Sempre cite suas fontes.' : ''}`,
-      messages: history
+      messages: apiHistory
     };
 
-    // Adiciona a ferramenta de web search se ativada
     if (webSearchEnabled) {
       requestBody.tools = [{
         type: "web_search_20250305",
@@ -831,18 +1160,20 @@ Para começar, cole sua chave de API Anthropic no campo acima.</div>
 
       if (!res.ok) {
         const errMsg = data?.error?.message || `Erro ${res.status}`;
-        addMsg('assistant', '⚠️ ' + errMsg, true);
+        conv.messages.push({
+          role: 'assistant',
+          content: '⚠️ ' + errMsg,
+          isError: true
+        });
       } else {
-        // Processa blocos de resposta
         const blocks = data.content || [];
         const textParts = [];
         const searchQueries = [];
-        const sourcesMap = new Map(); // Evita URLs duplicadas
+        const sourcesMap = new Map();
 
         blocks.forEach(block => {
           if (block.type === 'text') {
             textParts.push(block.text);
-            // Extrai citações se houver
             if (block.citations && Array.isArray(block.citations)) {
               block.citations.forEach(cit => {
                 if (cit.url && !sourcesMap.has(cit.url)) {
@@ -875,12 +1206,28 @@ Para começar, cole sua chave de API Anthropic no campo acima.</div>
         const reply = textParts.join('\n').trim() || 'Sem resposta.';
         const sources = Array.from(sourcesMap.values());
 
-        addAssistantMessage(reply, searchQueries, sources);
-        history.push({ role: 'assistant', content: reply });
+        conv.messages.push({
+          role: 'assistant',
+          content: reply,
+          searchQueries: searchQueries,
+          sources: sources
+        });
       }
+
+      conv.updatedAt = Date.now();
+      saveConversations();
+      renderMessages();
+      renderConversationsList();
     } catch (err) {
       removeTyping();
-      addMsg('assistant', '⚠️ Falha de conexão. Verifique sua internet e tente novamente.', true);
+      conv.messages.push({
+        role: 'assistant',
+        content: '⚠️ Falha de conexão. Verifique sua internet e tente novamente.',
+        isError: true
+      });
+      conv.updatedAt = Date.now();
+      saveConversations();
+      renderMessages();
       console.error(err);
     }
 
@@ -893,6 +1240,15 @@ Para começar, cole sua chave de API Anthropic no campo acima.</div>
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
   });
   inputEl.addEventListener('input', autoResize);
+
+  /* ── Inicialização ── */
+  if (conversations.length === 0 || !getCurrentConv()) {
+    renderConversationsList();
+    renderMessages();
+  } else {
+    renderConversationsList();
+    renderMessages();
+  }
 </script>
 </body>
 </html>
